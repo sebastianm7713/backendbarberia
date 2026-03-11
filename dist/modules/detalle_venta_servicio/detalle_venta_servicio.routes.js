@@ -1,0 +1,14 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const detalle_venta_servicio_controller_1 = require("./detalle_venta_servicio.controller");
+const auth_middleware_1 = require("../../middleware/auth.middleware");
+const router = (0, express_1.Router)();
+router.use(auth_middleware_1.verifyToken);
+router.get('/', detalle_venta_servicio_controller_1.detalleVentaServicioController.getAll);
+router.get('/:id', detalle_venta_servicio_controller_1.detalleVentaServicioController.getById);
+router.get('/venta/:id_venta', detalle_venta_servicio_controller_1.detalleVentaServicioController.getByVentaId);
+router.post('/', detalle_venta_servicio_controller_1.detalleVentaServicioController.create);
+router.put('/:id', detalle_venta_servicio_controller_1.detalleVentaServicioController.update);
+router.delete('/:id', detalle_venta_servicio_controller_1.detalleVentaServicioController.delete);
+exports.default = router;

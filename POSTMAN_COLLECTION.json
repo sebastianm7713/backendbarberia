@@ -1,0 +1,492 @@
+{
+  "info": {
+    "name": "BarbersiteApp API",
+    "description": "API para el sistema de gestión de barberia",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"juanperez@barber.com\",\n  \"password\": \"admin123\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:4000/api/auth/login",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "4000",
+              "path": ["api", "auth", "login"]
+            }
+          },
+          "response": [
+            {
+              "name": "Ejemplo respuesta",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": { "mode": "raw", "raw": "" },
+                "url": {
+                  "raw": "http://localhost:4000/api/auth/login",
+                  "protocol": "http",
+                  "host": ["localhost"],
+                  "port": "4000",
+                  "path": ["api", "auth", "login"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_body": "{\n  \"token\": \"<JWT>\",\n  \"user\": {\n    \"id_usuario\": 1,\n    \"nombre\": \"Juan Pérez\",\n    \"email\": \"juanperez@barber.com\",\n    \"id_rol\": 1,\n    \"permisos\": [\"ADMIN_TOTAL\"]\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Permisos actuales",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer TOKEN_AQUI"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:4000/api/auth/permisos",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "4000",
+              "path": ["api", "auth", "permisos"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Roles",
+      "item": [
+        {
+          "name": "Obtener todos",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer TOKEN_AQUI"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:4000/api/roles",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "4000",
+              "path": ["api", "roles"]
+            }
+          }
+        },
+        {
+          "name": "Obtener por ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer TOKEN_AQUI"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:4000/api/roles/1",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "4000",
+              "path": ["api", "roles", "1"]
+            }
+          }
+        },
+        {
+          "name": "Crear",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer TOKEN_AQUI"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Nuevo Rol\",\n  \"descripcion\": \"Descripcion del rol\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:4000/api/roles",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "4000",
+              "path": ["api", "roles"]
+            }
+          }
+        },
+        {
+          "name": "Actualizar",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer TOKEN_AQUI"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Rol Actualizado\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:4000/api/roles/1",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "4000",
+              "path": ["api", "roles", "1"]
+            }
+          }
+        },
+        {
+          "name": "Eliminar",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer TOKEN_AQUI"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:4000/api/roles/1",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "4000",
+              "path": ["api", "roles", "1"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Marcas",
+      "item": [
+        {
+          "name": "Obtener todas",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer TOKEN_AQUI"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:4000/api/marcas",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "4000",
+              "path": ["api", "marcas"]
+            }
+          }
+        },
+        {
+          "name": "Crear marca",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer TOKEN_AQUI"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Nueva Marca\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:4000/api/marcas",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "4000",
+              "path": ["api", "marcas"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Categorias de Productos",
+      "item": [
+        {
+          "name": "Obtener todas",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer TOKEN_AQUI"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:4000/api/categorias-productos",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "4000",
+              "path": ["api", "categorias-productos"]
+            }
+          }
+        },
+        {
+          "name": "Crear categoria",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer TOKEN_AQUI"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Nueva Categoria\",\n  \"descripcion\": \"Descripcion de la categoria\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:4000/api/categorias-productos",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "4000",
+              "path": ["api", "categorias-productos"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Clientes",
+      "item": [
+        {
+          "name": "Obtener todos",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer TOKEN_AQUI"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:4000/api/clientes",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "4000",
+              "path": ["api", "clientes"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Barberos",
+      "item": [
+        {
+          "name": "Obtener todos",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer TOKEN_AQUI"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:4000/api/barberos",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "4000",
+              "path": ["api", "barberos"]
+            }
+          }
+        },
+        {
+          "name": "Crear barbero",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer TOKEN_AQUI"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id_usuario\": 2,\n  \"tipo_contrato\": \"porcentaje\",\n  \"porcentaje_ganancia\": 50\n}"
+            },
+            "url": {
+              "raw": "http://localhost:4000/api/barberos",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "4000",
+              "path": ["api", "barberos"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Compras",
+      "item": [
+        {
+          "name": "Obtener todas",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer TOKEN_AQUI"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:4000/api/compras",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "4000",
+              "path": ["api", "compras"]
+            }
+          }
+        },
+        {
+          "name": "Crear compra",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer TOKEN_AQUI"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id_proveedor\": 1,\n  \"detalles\": [\n    {\n      \"id_producto\": 1,\n      \"cantidad\": 5,\n      \"costo_unitario\": 15000\n    },\n    {\n      \"id_producto\": 2,\n      \"cantidad\": 3,\n      \"costo_unitario\": 20000\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "http://localhost:4000/api/compras",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "4000",
+              "path": ["api", "compras"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Alquiler Silla",
+      "item": [
+        {
+          "name": "Obtener todos",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer TOKEN_AQUI"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:4000/api/alquiler-silla",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "4000",
+              "path": ["api", "alquiler-silla"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Disponibilidad Excepcion",
+      "item": [
+        {
+          "name": "Obtener todas",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer TOKEN_AQUI"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:4000/api/disponibilidad-excepcion",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "4000",
+              "path": ["api", "disponibilidad-excepcion"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Permisos",
+      "item": [
+        {
+          "name": "Obtener todos",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer TOKEN_AQUI"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:4000/api/permisos",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "4000",
+              "path": ["api", "permisos"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
