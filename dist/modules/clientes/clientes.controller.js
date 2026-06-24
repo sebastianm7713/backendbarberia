@@ -39,11 +39,30 @@ const zod_1 = require("zod");
 const clientes_schema_1 = require("./clientes.schema");
 const obtenerTodos = async (req, res) => {
     try {
-        const clientes = await service.getAllClientes();
-        res.json(clientes);
+        const user = req.user;
+        const userRole = Number(user?.rol ?? user?.role ?? user?.id_rol ?? -1);
+        const userId = Number(user?.id_usuario ?? user?.id ?? user?.userId ?? null);
+        if ([1, 2, 4, 5].includes(userRole)) {
+            const clientes = await service.getAllClientes();
+            console.log('obtenerTodos clientes result:', clientes);
+            return res.json({ success: true, data: clientes });
+        }
+        if (userRole === 3) {
+            if (!userId) {
+                return res.status(400).json({ success: false, message: 'No se pudo identificar al cliente autenticado' });
+            }
+            const cliente = await service.getClienteByUsuarioId(userId);
+            console.log('obtenerTodos cliente own result:', cliente);
+            if (!cliente) {
+                return res.status(404).json({ success: false, message: 'Cliente no encontrado para el usuario autenticado' });
+            }
+            return res.json({ success: true, data: [cliente] });
+        }
+        return res.status(403).json({ success: false, message: 'No autorizado' });
     }
     catch (error) {
-        res.status(500).json({ message: error.message });
+        console.error('Error in obtenerTodos:', error);
+        res.status(500).json({ success: false, message: error.message });
     }
 };
 exports.obtenerTodos = obtenerTodos;
@@ -52,37 +71,48 @@ const obtenerPorId = async (req, res) => {
         const rawId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
         const id = parseInt(rawId);
         if (isNaN(id)) {
-            return res.status(400).json({ message: "ID inválido" });
+            return res.status(400).json({ success: false, message: "ID inválido" });
         }
         const { id: validatedId } = clientes_schema_1.clienteIdSchema.parse({ id });
         const cliente = await service.getClienteById(validatedId);
+        console.log('obtenerPorId cliente result:', cliente);
         if (!cliente) {
-            return res.status(404).json({ message: "Cliente no encontrado" });
+            return res.status(404).json({ success: false, message: "Cliente no encontrado" });
         }
-        res.json(cliente);
+        const user = req.user;
+        const userRole = Number(user?.rol ?? user?.role ?? user?.id_rol ?? -1);
+        const userId = Number(user?.id_usuario ?? user?.id ?? user?.userId ?? null);
+        if (userRole === 3 && cliente.id_usuario !== userId) {
+            return res.status(403).json({ success: false, message: 'No autorizado para ver este cliente' });
+        }
+        res.json({ success: true, data: cliente });
     }
     catch (error) {
+        console.error('Error in obtenerPorId:', error);
         if (error instanceof zod_1.z.ZodError) {
-            res.status(400).json({ message: "ID inválido", errors: error.issues });
+            res.status(400).json({ success: false, message: "ID inválido", errors: error.issues });
         }
         else {
-            res.status(500).json({ message: error.message });
+            res.status(500).json({ success: false, message: error.message });
         }
     }
 };
 exports.obtenerPorId = obtenerPorId;
 const crear = async (req, res) => {
     try {
+        console.log('crear req.body:', req.body);
         const validatedData = clientes_schema_1.createClienteSchema.parse(req.body);
         const result = await service.createCliente(validatedData);
-        res.status(201).json(result);
+        console.log('crear result:', result);
+        res.status(201).json({ success: true, data: result });
     }
     catch (error) {
+        console.error('Error in crear:', error);
         if (error instanceof zod_1.z.ZodError) {
-            res.status(400).json({ message: "Datos inválidos", errors: error.issues });
+            res.status(400).json({ success: false, message: "Datos inválidos", errors: error.issues });
         }
         else {
-            res.status(500).json({ message: error.message });
+            res.status(500).json({ success: false, message: error.message });
         }
     }
 };
@@ -92,19 +122,22 @@ const actualizar = async (req, res) => {
         const rawId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
         const id = parseInt(rawId);
         if (isNaN(id)) {
-            return res.status(400).json({ message: "ID inválido" });
+            return res.status(400).json({ success: false, message: "ID inválido" });
         }
         const { id: validatedId } = clientes_schema_1.clienteIdSchema.parse({ id });
+        console.log('actualizar req.body:', req.body);
         const validatedData = clientes_schema_1.updateClienteSchema.parse(req.body);
         const result = await service.updateCliente(validatedId, validatedData);
-        res.json(result);
+        console.log('actualizar result:', result);
+        res.json({ success: true, data: result });
     }
     catch (error) {
+        console.error('Error in actualizar:', error);
         if (error instanceof zod_1.z.ZodError) {
-            res.status(400).json({ message: "Datos inválidos", errors: error.issues });
+            res.status(400).json({ success: false, message: "Datos inválidos", errors: error.issues });
         }
         else {
-            res.status(500).json({ message: error.message });
+            res.status(500).json({ success: false, message: error.message });
         }
     }
 };
@@ -114,18 +147,20 @@ const eliminar = async (req, res) => {
         const rawId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
         const id = parseInt(rawId);
         if (isNaN(id)) {
-            return res.status(400).json({ message: "ID inválido" });
+            return res.status(400).json({ success: false, message: "ID inválido" });
         }
         const { id: validatedId } = clientes_schema_1.clienteIdSchema.parse({ id });
         const result = await service.deleteCliente(validatedId);
-        res.json(result);
+        console.log('eliminar result:', result);
+        res.json({ success: true, data: result });
     }
     catch (error) {
+        console.error('Error in eliminar:', error);
         if (error instanceof zod_1.z.ZodError) {
-            res.status(400).json({ message: "ID inválido", errors: error.issues });
+            res.status(400).json({ success: false, message: "ID inválido", errors: error.issues });
         }
         else {
-            res.status(500).json({ message: error.message });
+            res.status(500).json({ success: false, message: error.message });
         }
     }
 };

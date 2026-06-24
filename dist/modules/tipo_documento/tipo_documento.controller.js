@@ -40,10 +40,12 @@ const tipo_documento_schema_1 = require("./tipo_documento.schema");
 const obtenerTodos = async (req, res) => {
     try {
         const tipos = await service.getAllTiposDocumento();
-        res.json(tipos);
+        console.log('obtenerTodos result:', tipos);
+        res.json({ success: true, data: tipos });
     }
     catch (error) {
-        res.status(500).json({ message: error.message });
+        console.error('Error in obtenerTodos:', error);
+        res.status(500).json({ success: false, message: error.message });
     }
 };
 exports.obtenerTodos = obtenerTodos;
@@ -53,22 +55,37 @@ const obtenerPorId = async (req, res) => {
         const { id } = tipo_documento_schema_1.tipoDocumentoIdSchema.parse({ id: parseInt(rawId) });
         const tipo = await service.getTipoDocumentoById(id);
         if (!tipo)
-            return res.status(404).json({ message: "Tipo de documento no encontrado" });
-        res.json(tipo);
+            return res.status(404).json({ success: false, message: "Tipo de documento no encontrado" });
+        console.log('obtenerPorId result:', tipo);
+        res.json({ success: true, data: tipo });
     }
     catch (error) {
-        res.status(error instanceof zod_1.z.ZodError ? 400 : 500).json({ message: error.message });
+        console.error('Error in obtenerPorId:', error);
+        if (error instanceof zod_1.z.ZodError) {
+            res.status(400).json({ success: false, message: "ID inválido", errors: error.issues });
+        }
+        else {
+            res.status(500).json({ success: false, message: error.message });
+        }
     }
 };
 exports.obtenerPorId = obtenerPorId;
 const crear = async (req, res) => {
     try {
+        console.log('crear req.body:', req.body);
         const validatedData = tipo_documento_schema_1.createTipoDocumentoSchema.parse(req.body);
         const result = await service.createTipoDocumento(validatedData);
-        res.status(201).json(result);
+        console.log('crear result:', result);
+        res.status(201).json({ success: true, data: result });
     }
     catch (error) {
-        res.status(error instanceof zod_1.z.ZodError ? 400 : 500).json({ message: error.message });
+        console.error('Error in crear:', error);
+        if (error instanceof zod_1.z.ZodError) {
+            res.status(400).json({ success: false, message: "Datos inválidos", errors: error.issues });
+        }
+        else {
+            res.status(500).json({ success: false, message: error.message });
+        }
     }
 };
 exports.crear = crear;
@@ -76,12 +93,20 @@ const actualizar = async (req, res) => {
     try {
         const rawId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
         const { id } = tipo_documento_schema_1.tipoDocumentoIdSchema.parse({ id: parseInt(rawId) });
+        console.log('actualizar req.body:', req.body);
         const validatedData = tipo_documento_schema_1.updateTipoDocumentoSchema.parse(req.body);
         const result = await service.updateTipoDocumento(id, validatedData);
-        res.json(result);
+        console.log('actualizar result:', result);
+        res.json({ success: true, data: result });
     }
     catch (error) {
-        res.status(error instanceof zod_1.z.ZodError ? 400 : 500).json({ message: error.message });
+        console.error('Error in actualizar:', error);
+        if (error instanceof zod_1.z.ZodError) {
+            res.status(400).json({ success: false, message: "Datos inválidos", errors: error.issues });
+        }
+        else {
+            res.status(500).json({ success: false, message: error.message });
+        }
     }
 };
 exports.actualizar = actualizar;
@@ -90,10 +115,17 @@ const eliminar = async (req, res) => {
         const rawId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
         const { id } = tipo_documento_schema_1.tipoDocumentoIdSchema.parse({ id: parseInt(rawId) });
         const result = await service.deleteTipoDocumento(id);
-        res.json(result);
+        console.log('eliminar result:', result);
+        res.json({ success: true, data: result });
     }
     catch (error) {
-        res.status(error instanceof zod_1.z.ZodError ? 400 : 500).json({ message: error.message });
+        console.error('Error in eliminar:', error);
+        if (error instanceof zod_1.z.ZodError) {
+            res.status(400).json({ success: false, message: "ID inválido", errors: error.issues });
+        }
+        else {
+            res.status(500).json({ success: false, message: error.message });
+        }
     }
 };
 exports.eliminar = eliminar;

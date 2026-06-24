@@ -1,8 +1,140 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.listar = void 0;
-const productos_service_1 = require("./productos.service");
+exports.eliminar = exports.actualizar = exports.crear = exports.obtenerPorId = exports.listar = void 0;
+const service = __importStar(require("./productos.service"));
+const zod_1 = require("zod");
+const productos_schema_1 = require("./productos.schema");
 const listar = async (_, res) => {
-    res.json(await (0, productos_service_1.getProductos)());
+    try {
+        const productos = await service.getProductos();
+        console.log('listar productos result:', productos);
+        res.json({ success: true, data: productos });
+    }
+    catch (error) {
+        console.error('Error in listar:', error);
+        res.status(500).json({ success: false, message: error.message });
+    }
 };
 exports.listar = listar;
+const obtenerPorId = async (req, res) => {
+    try {
+        const rawId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+        const id = parseInt(rawId);
+        if (isNaN(id))
+            return res.status(400).json({ success: false, message: "ID inválido" });
+        const { id: validatedId } = productos_schema_1.productoIdSchema.parse({ id });
+        const producto = await service.getProductoById(validatedId);
+        console.log('obtenerPorId producto result:', producto);
+        if (!producto)
+            return res.status(404).json({ success: false, message: "Producto no encontrado" });
+        res.json({ success: true, data: producto });
+    }
+    catch (error) {
+        console.error('Error in obtenerPorId:', error);
+        if (error instanceof zod_1.z.ZodError) {
+            res.status(400).json({ success: false, message: "ID inválido", errors: error.issues });
+        }
+        else {
+            res.status(500).json({ success: false, message: error.message });
+        }
+    }
+};
+exports.obtenerPorId = obtenerPorId;
+const crear = async (req, res) => {
+    try {
+        console.log('crear req.body:', req.body);
+        const validated = productos_schema_1.createProductoSchema.parse(req.body);
+        const result = await service.createProducto(validated);
+        console.log('crear result:', result);
+        res.status(201).json({ success: true, data: result });
+    }
+    catch (error) {
+        console.error('Error in crear:', error);
+        if (error instanceof zod_1.z.ZodError) {
+            res.status(400).json({ success: false, message: "Datos inválidos", errors: error.issues });
+        }
+        else {
+            res.status(500).json({ success: false, message: error.message });
+        }
+    }
+};
+exports.crear = crear;
+const actualizar = async (req, res) => {
+    try {
+        const rawId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+        const id = parseInt(rawId);
+        if (isNaN(id))
+            return res.status(400).json({ success: false, message: "ID inválido" });
+        const { id: validatedId } = productos_schema_1.productoIdSchema.parse({ id });
+        console.log('actualizar req.body:', req.body);
+        const validatedData = productos_schema_1.updateProductoSchema.parse(req.body);
+        const result = await service.updateProducto(validatedId, validatedData);
+        console.log('actualizar result:', result);
+        res.json({ success: true, data: result });
+    }
+    catch (error) {
+        console.error('Error in actualizar:', error);
+        if (error instanceof zod_1.z.ZodError) {
+            res.status(400).json({ success: false, message: "Datos inválidos", errors: error.issues });
+        }
+        else {
+            res.status(500).json({ success: false, message: error.message });
+        }
+    }
+};
+exports.actualizar = actualizar;
+const eliminar = async (req, res) => {
+    try {
+        const rawId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+        const id = parseInt(rawId);
+        if (isNaN(id))
+            return res.status(400).json({ success: false, message: "ID inválido" });
+        const { id: validatedId } = productos_schema_1.productoIdSchema.parse({ id });
+        await service.deleteProducto(validatedId);
+        console.log('eliminar success');
+        res.json({ success: true, data: { message: "Producto eliminado correctamente" } });
+    }
+    catch (error) {
+        console.error('Error in eliminar:', error);
+        if (error instanceof zod_1.z.ZodError) {
+            res.status(400).json({ success: false, message: "ID inválido", errors: error.issues });
+        }
+        else {
+            res.status(500).json({ success: false, message: error.message });
+        }
+    }
+};
+exports.eliminar = eliminar;

@@ -40,10 +40,12 @@ const barberos_schema_1 = require("./barberos.schema");
 const obtenerTodos = async (req, res) => {
     try {
         const barberos = await service.getAllBarberos();
-        res.json(barberos);
+        console.log('obtenerTodos barberos result:', barberos);
+        res.json({ success: true, data: barberos });
     }
     catch (error) {
-        res.status(500).json({ message: error.message });
+        console.error('Error in obtenerTodos:', error);
+        res.status(500).json({ success: false, message: error.message });
     }
 };
 exports.obtenerTodos = obtenerTodos;
@@ -52,37 +54,42 @@ const obtenerPorId = async (req, res) => {
         const rawId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
         const id = parseInt(rawId);
         if (isNaN(id)) {
-            return res.status(400).json({ message: "ID inválido" });
+            return res.status(400).json({ success: false, message: "ID inválido" });
         }
         const { id: validatedId } = barberos_schema_1.barberoIdSchema.parse({ id });
         const barbero = await service.getBarberoById(validatedId);
+        console.log('obtenerPorId barbero result:', barbero);
         if (!barbero) {
-            return res.status(404).json({ message: "Barbero no encontrado" });
+            return res.status(404).json({ success: false, message: "Barbero no encontrado" });
         }
-        res.json(barbero);
+        res.json({ success: true, data: barbero });
     }
     catch (error) {
+        console.error('Error in obtenerPorId:', error);
         if (error instanceof zod_1.z.ZodError) {
-            res.status(400).json({ message: "ID inválido", errors: error.issues });
+            res.status(400).json({ success: false, message: "ID inválido", errors: error.issues });
         }
         else {
-            res.status(500).json({ message: error.message });
+            res.status(500).json({ success: false, message: error.message });
         }
     }
 };
 exports.obtenerPorId = obtenerPorId;
 const crear = async (req, res) => {
     try {
+        console.log('crear req.body:', req.body);
         const validatedData = barberos_schema_1.createBarberoSchema.parse(req.body);
         const result = await service.createBarbero(validatedData);
-        res.status(201).json(result);
+        console.log('crear result:', result);
+        res.status(201).json({ success: true, data: result });
     }
     catch (error) {
+        console.error('Error in crear:', error);
         if (error instanceof zod_1.z.ZodError) {
-            res.status(400).json({ message: "Datos inválidos", errors: error.issues });
+            res.status(400).json({ success: false, message: "Datos inválidos", errors: error.issues });
         }
         else {
-            res.status(500).json({ message: error.message });
+            res.status(500).json({ success: false, message: error.message });
         }
     }
 };
@@ -92,19 +99,22 @@ const actualizar = async (req, res) => {
         const rawId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
         const id = parseInt(rawId);
         if (isNaN(id)) {
-            return res.status(400).json({ message: "ID inválido" });
+            return res.status(400).json({ success: false, message: "ID inválido" });
         }
         const { id: validatedId } = barberos_schema_1.barberoIdSchema.parse({ id });
+        console.log('actualizar req.body:', req.body);
         const validatedData = barberos_schema_1.updateBarberoSchema.parse(req.body);
         const result = await service.updateBarbero(validatedId, validatedData);
-        res.json(result);
+        console.log('actualizar result:', result);
+        res.json({ success: true, data: result });
     }
     catch (error) {
+        console.error('Error in actualizar:', error);
         if (error instanceof zod_1.z.ZodError) {
-            res.status(400).json({ message: "Datos inválidos", errors: error.issues });
+            res.status(400).json({ success: false, message: "Datos inválidos", errors: error.issues });
         }
         else {
-            res.status(500).json({ message: error.message });
+            res.status(500).json({ success: false, message: error.message });
         }
     }
 };
@@ -114,18 +124,20 @@ const eliminar = async (req, res) => {
         const rawId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
         const id = parseInt(rawId);
         if (isNaN(id)) {
-            return res.status(400).json({ message: "ID inválido" });
+            return res.status(400).json({ success: false, message: "ID inválido" });
         }
         const { id: validatedId } = barberos_schema_1.barberoIdSchema.parse({ id });
         const result = await service.deleteBarbero(validatedId);
-        res.json(result);
+        console.log('eliminar result:', result);
+        res.json({ success: true, data: result });
     }
     catch (error) {
+        console.error('Error in eliminar:', error);
         if (error instanceof zod_1.z.ZodError) {
-            res.status(400).json({ message: "ID inválido", errors: error.issues });
+            res.status(400).json({ success: false, message: "ID inválido", errors: error.issues });
         }
         else {
-            res.status(500).json({ message: error.message });
+            res.status(500).json({ success: false, message: error.message });
         }
     }
 };

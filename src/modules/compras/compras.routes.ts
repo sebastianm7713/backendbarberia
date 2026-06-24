@@ -1,7 +1,7 @@
 import { Router } from "express";
-import { crear, obtenerTodos, obtenerPorId, actualizar, eliminar } from "./compras.controller";
+import { crear, obtenerTodos, obtenerPorId, obtenerPorEstado, actualizar, eliminar } from "./compras.controller";
 import { verifyToken } from "../../middleware/auth.middleware";
-import { authorizeRoles } from "../../middleware/role.middleware";
+import { authorizeByModule } from "../../middleware/permission.middleware";
 
 const router = Router();
 
@@ -9,35 +9,42 @@ const router = Router();
 router.post(
   "/",
   verifyToken,
-  authorizeRoles(1, 2),
+  authorizeByModule('Compras'),
   crear
 );
 
 router.get(
   "/",
   verifyToken,
-  authorizeRoles(1, 2),
+  authorizeByModule('Compras'),
   obtenerTodos
+);
+
+router.get(
+  "/estado/:estado",
+  verifyToken,
+  authorizeByModule('Compras'),
+  obtenerPorEstado
 );
 
 router.get(
   "/:id",
   verifyToken,
-  authorizeRoles(1, 2),
+  authorizeByModule('Compras'),
   obtenerPorId
 );
 
 router.put(
   "/:id",
   verifyToken,
-  authorizeRoles(1, 2),
+  authorizeByModule('Compras'),
   actualizar
 );
 
 router.delete(
   "/:id",
   verifyToken,
-  authorizeRoles(1, 2),
+  authorizeByModule('Compras'),
   eliminar
 );
 

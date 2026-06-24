@@ -9,8 +9,8 @@ export const getBarberoById = async (id: number) => {
 };
 
 export const createBarbero = async (data: any) => {
-  await repository.createBarbero(data);
-  return { message: "Barbero creado correctamente" };
+  const id_barbero = await repository.createBarbero(data);
+  return { id_barbero, message: "Barbero creado correctamente" };
 };
 
 export const updateBarbero = async (id: number, data: any) => {

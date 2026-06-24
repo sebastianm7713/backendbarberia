@@ -1,11 +1,17 @@
-import { pool } from './src/config/database';
+import { pool } from '../src/config/database';
+import sql from 'mssql';
 
 (async () => {
   try {
-    const result = await pool.request().query('SELECT id_usuario, nombre, email, password, rol_id FROM usuarios');
+    // Asegurarse de que la conexión esté abierta
+    if (pool.connected === false) {
+      await pool.connect();
+    }
+
+    const result = await pool.request().query('SELECT id_usuario, nombre, email, contrasena, id_rol FROM usuarios');
     console.log('Usuarios en BD:');
-    result.recordset.forEach(user => {
-      console.log(`ID: ${user.id_usuario}, Email: ${user.email}, Password length: ${user.password.length}, Rol: ${user.rol_id}`);
+    result.recordset.forEach((user: any) => {
+      console.log(`ID: ${user.id_usuario}, Email: ${user.email}, Password length: ${user.contrasena?.length || 0}, Rol: ${user.id_rol}`);
     });
   } catch (error) {
     console.error('Error:', error);

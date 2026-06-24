@@ -13,18 +13,19 @@ const getCategoriaById = async (id) => {
 };
 exports.getCategoriaById = getCategoriaById;
 const createCategoria = async (data) => {
-    const { nombre, descripcion } = data;
+    const { nombre, descripcion, estado } = data;
     const idResult = await database_1.pool.request().query("SELECT ISNULL(MAX(id_categoria), 0) + 1 AS nextId FROM Categorias_Productos");
     const id = idResult.recordset[0].nextId;
     await database_1.pool.request()
         .input("id", id)
         .input("nombre", nombre)
         .input("descripcion", descripcion || null)
-        .query("INSERT INTO Categorias_Productos (id_categoria, nombre, descripcion) VALUES (@id, @nombre, @descripcion)");
+        .input("estado", estado || 'Activo')
+        .query("INSERT INTO Categorias_Productos (id_categoria, nombre, descripcion, estado) VALUES (@id, @nombre, @descripcion, @estado)");
 };
 exports.createCategoria = createCategoria;
 const updateCategoria = async (id, data) => {
-    const { nombre, descripcion } = data;
+    const { nombre, descripcion, estado } = data;
     const updates = [];
     const request = database_1.pool.request().input("id", id);
     if (nombre !== undefined) {
@@ -34,6 +35,10 @@ const updateCategoria = async (id, data) => {
     if (descripcion !== undefined) {
         updates.push("descripcion = @descripcion");
         request.input("descripcion", descripcion);
+    }
+    if (estado !== undefined) {
+        updates.push("estado = @estado");
+        request.input("estado", estado);
     }
     if (updates.length > 0) {
         await request.query(`UPDATE Categorias_Productos SET ${updates.join(", ")} WHERE id_categoria = @id`);

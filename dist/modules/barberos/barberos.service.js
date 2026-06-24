@@ -44,8 +44,8 @@ const getBarberoById = async (id) => {
 };
 exports.getBarberoById = getBarberoById;
 const createBarbero = async (data) => {
-    await repository.createBarbero(data);
-    return { message: "Barbero creado correctamente" };
+    const id_barbero = await repository.createBarbero(data);
+    return { id_barbero, message: "Barbero creado correctamente" };
 };
 exports.createBarbero = createBarbero;
 const updateBarbero = async (id, data) => {

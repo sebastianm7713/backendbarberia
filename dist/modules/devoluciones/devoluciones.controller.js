@@ -33,17 +33,19 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.eliminar = exports.actualizar = exports.crear = exports.obtenerPorId = exports.obtenerTodos = void 0;
+exports.obtenerProductosPorProveedor = exports.eliminar = exports.actualizar = exports.crear = exports.obtenerPorId = exports.obtenerTodos = void 0;
 const service = __importStar(require("./devoluciones.service"));
 const zod_1 = require("zod");
 const devoluciones_schema_1 = require("./devoluciones.schema");
-const obtenerTodos = async (req, res) => {
+const obtenerTodos = async (_, res) => {
     try {
         const devoluciones = await service.getAllDevoluciones();
-        res.json(devoluciones);
+        console.log('obtenerTodos devoluciones result:', devoluciones);
+        res.json({ success: true, data: devoluciones });
     }
     catch (error) {
-        res.status(500).json({ message: error.message });
+        console.error('Error in obtenerTodos:', error);
+        res.status(500).json({ success: false, message: error.message });
     }
 };
 exports.obtenerTodos = obtenerTodos;
@@ -52,23 +54,28 @@ const obtenerPorId = async (req, res) => {
         const rawId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
         const { id } = devoluciones_schema_1.devolucionIdSchema.parse({ id: parseInt(rawId) });
         const devolucion = await service.getDevolucionById(id);
+        console.log('obtenerPorId devolucion result:', devolucion);
         if (!devolucion)
-            return res.status(404).json({ message: "Devolucion no encontrada" });
-        res.json(devolucion);
+            return res.status(404).json({ success: false, message: "Devolucion no encontrada" });
+        res.json({ success: true, data: devolucion });
     }
     catch (error) {
-        res.status(error instanceof zod_1.z.ZodError ? 400 : 500).json({ message: error.message });
+        console.error('Error in obtenerPorId:', error);
+        res.status(error instanceof zod_1.z.ZodError ? 400 : 500).json({ success: false, message: error.message });
     }
 };
 exports.obtenerPorId = obtenerPorId;
 const crear = async (req, res) => {
     try {
+        console.log('crear req.body:', req.body);
         const validatedData = devoluciones_schema_1.createDevolucionSchema.parse(req.body);
         const result = await service.createDevolucion(validatedData);
-        res.status(201).json(result);
+        console.log('crear result:', result);
+        res.status(201).json({ success: true, data: result });
     }
     catch (error) {
-        res.status(error instanceof zod_1.z.ZodError ? 400 : 500).json({ message: error.message });
+        console.error('Error in crear:', error);
+        res.status(error instanceof zod_1.z.ZodError ? 400 : 500).json({ success: false, message: error.message });
     }
 };
 exports.crear = crear;
@@ -76,12 +83,15 @@ const actualizar = async (req, res) => {
     try {
         const rawId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
         const { id } = devoluciones_schema_1.devolucionIdSchema.parse({ id: parseInt(rawId) });
+        console.log('actualizar req.body:', req.body);
         const validatedData = devoluciones_schema_1.updateDevolucionSchema.parse(req.body);
         const result = await service.updateDevolucion(id, validatedData);
-        res.json(result);
+        console.log('actualizar result:', result);
+        res.json({ success: true, data: result });
     }
     catch (error) {
-        res.status(error instanceof zod_1.z.ZodError ? 400 : 500).json({ message: error.message });
+        console.error('Error in actualizar:', error);
+        res.status(error instanceof zod_1.z.ZodError ? 400 : 500).json({ success: false, message: error.message });
     }
 };
 exports.actualizar = actualizar;
@@ -90,10 +100,31 @@ const eliminar = async (req, res) => {
         const rawId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
         const { id } = devoluciones_schema_1.devolucionIdSchema.parse({ id: parseInt(rawId) });
         const result = await service.deleteDevolucion(id);
-        res.json(result);
+        console.log('eliminar result:', result);
+        res.json({ success: true, data: result });
     }
     catch (error) {
-        res.status(error instanceof zod_1.z.ZodError ? 400 : 500).json({ message: error.message });
+        console.error('Error in eliminar:', error);
+        res.status(error instanceof zod_1.z.ZodError ? 400 : 500).json({ success: false, message: error.message });
     }
 };
 exports.eliminar = eliminar;
+const obtenerProductosPorProveedor = async (req, res) => {
+    try {
+        const rawId = Array.isArray(req.params.id_proveedor) ? req.params.id_proveedor[0] : req.params.id_proveedor;
+        const { id_proveedor } = devoluciones_schema_1.productosPorProveedorSchema.parse({ id_proveedor: parseInt(rawId) });
+        const productos = await service.getProductosPorProveedor(id_proveedor);
+        console.log('obtenerProductosPorProveedor result:', productos);
+        res.json({ success: true, data: productos });
+    }
+    catch (error) {
+        console.error('Error in obtenerProductosPorProveedor:', error);
+        if (error instanceof zod_1.z.ZodError) {
+            res.status(400).json({ success: false, message: "ID de proveedor inválido", errors: error.issues });
+        }
+        else {
+            res.status(500).json({ success: false, message: error.message });
+        }
+    }
+};
+exports.obtenerProductosPorProveedor = obtenerProductosPorProveedor;

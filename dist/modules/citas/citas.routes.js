@@ -38,13 +38,24 @@ const citas_controller_1 = require("./citas.controller");
 const validation_middleware_1 = require("../../middleware/validation.middleware");
 const schema = __importStar(require("./citas.schema"));
 const auth_middleware_1 = require("../../middleware/auth.middleware");
-const role_middleware_1 = require("../../middleware/role.middleware");
+const permission_middleware_1 = require("../../middleware/permission.middleware");
 const router = (0, express_1.Router)();
-// Crear cita
-router.post("/", auth_middleware_1.verifyToken, (0, role_middleware_1.authorizeRoles)(1, 2), (0, validation_middleware_1.validate)(schema.createCitaSchema), citas_controller_1.crear);
-// Listar citas
-router.get("/", auth_middleware_1.verifyToken, (0, role_middleware_1.authorizeRoles)(1, 2), citas_controller_1.listar);
-// Cambiar estado
-router.put("/:id", auth_middleware_1.verifyToken, (0, role_middleware_1.authorizeRoles)(1, 2), (0, validation_middleware_1.validate)(schema.updateCitaEstadoSchema), citas_controller_1.actualizarEstado);
-router.get("/:id", auth_middleware_1.verifyToken, (0, role_middleware_1.authorizeRoles)(1, 2), citas_controller_1.obtenerPorId);
+// Crear cita (permitir usuarios con permiso sobre Citas o reservar)
+router.post("/", auth_middleware_1.verifyToken, (0, permission_middleware_1.authorizeAnyPermission)('citas', 'reservar', 'gestión de citas'), (0, validation_middleware_1.validate)(schema.createCitaSchema), citas_controller_1.crear);
+// Crear cita desde landing sin login
+router.post("/landing", (0, validation_middleware_1.validate)(schema.createCitaLandingSchema), citas_controller_1.crearDesdeLanding);
+// Listar citas públicas (para landing)
+router.get("/public", citas_controller_1.listar);
+// Listar citas (permitir usuarios con permiso de ver citas)
+router.get("/", auth_middleware_1.verifyToken, (0, permission_middleware_1.authorizeAnyPermission)('citas', 'ver citas', 'ver citas propias'), citas_controller_1.listar);
+// Obtener horas disponibles de un barbero en una fecha (solo usuarios autenticados)
+router.get("/disponibilidad/horario", auth_middleware_1.verifyToken, (0, permission_middleware_1.authorizeAnyPermission)('citas', 'ver citas', 'ver citas propias'), citas_controller_1.obtenerHorasDisponibles);
+// Obtener horas disponibles de un barbero en una fecha desde landing sin login
+router.get("/landing/disponibilidad/horario", citas_controller_1.obtenerHorasDisponibles);
+// Actualizar cita completa o estado
+router.put("/:id", auth_middleware_1.verifyToken, (0, permission_middleware_1.authorizeAnyPermission)('citas', 'editar citas', 'gestión de citas'), (0, validation_middleware_1.validate)(schema.updateCitaSchema), citas_controller_1.actualizar);
+// Obtener cita por ID
+router.get("/:id", auth_middleware_1.verifyToken, (0, permission_middleware_1.authorizeAnyPermission)('citas', 'ver citas', 'ver citas propias'), citas_controller_1.obtenerPorId);
+// Eliminar cita
+router.delete("/:id", auth_middleware_1.verifyToken, (0, permission_middleware_1.authorizeAnyPermission)('citas', 'eliminar citas', 'gestión de citas'), citas_controller_1.eliminar);
 exports.default = router;

@@ -37,13 +37,15 @@ exports.eliminar = exports.actualizar = exports.crear = exports.obtenerPorId = e
 const service = __importStar(require("./marcas.service"));
 const zod_1 = require("zod");
 const marcas_schema_1 = require("./marcas.schema");
-const obtenerTodos = async (req, res) => {
+const obtenerTodos = async (_, res) => {
     try {
         const marcas = await service.getAllMarcas();
-        res.json(marcas);
+        console.log('obtenerTodos marcas result:', marcas);
+        res.json({ success: true, data: marcas });
     }
     catch (error) {
-        res.status(500).json({ message: error.message });
+        console.error('Error in obtenerTodos:', error);
+        res.status(500).json({ success: false, message: error.message });
     }
 };
 exports.obtenerTodos = obtenerTodos;
@@ -52,23 +54,28 @@ const obtenerPorId = async (req, res) => {
         const rawId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
         const { id } = marcas_schema_1.marcaIdSchema.parse({ id: parseInt(rawId) });
         const marca = await service.getMarcaById(id);
+        console.log('obtenerPorId marca result:', marca);
         if (!marca)
-            return res.status(404).json({ message: "Marca no encontrada" });
-        res.json(marca);
+            return res.status(404).json({ success: false, message: "Marca no encontrada" });
+        res.json({ success: true, data: marca });
     }
     catch (error) {
-        res.status(error instanceof zod_1.z.ZodError ? 400 : 500).json({ message: error.message });
+        console.error('Error in obtenerPorId:', error);
+        res.status(error instanceof zod_1.z.ZodError ? 400 : 500).json({ success: false, message: error.message });
     }
 };
 exports.obtenerPorId = obtenerPorId;
 const crear = async (req, res) => {
     try {
+        console.log('crear req.body:', req.body);
         const validatedData = marcas_schema_1.createMarcaSchema.parse(req.body);
         const result = await service.createMarca(validatedData);
-        res.status(201).json(result);
+        console.log('crear result:', result);
+        res.status(201).json({ success: true, data: result });
     }
     catch (error) {
-        res.status(error instanceof zod_1.z.ZodError ? 400 : 500).json({ message: error.message });
+        console.error('Error in crear:', error);
+        res.status(error instanceof zod_1.z.ZodError ? 400 : 500).json({ success: false, message: error.message });
     }
 };
 exports.crear = crear;
@@ -76,12 +83,15 @@ const actualizar = async (req, res) => {
     try {
         const rawId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
         const { id } = marcas_schema_1.marcaIdSchema.parse({ id: parseInt(rawId) });
+        console.log('actualizar req.body:', req.body);
         const validatedData = marcas_schema_1.updateMarcaSchema.parse(req.body);
         const result = await service.updateMarca(id, validatedData);
-        res.json(result);
+        console.log('actualizar result:', result);
+        res.json({ success: true, data: result });
     }
     catch (error) {
-        res.status(error instanceof zod_1.z.ZodError ? 400 : 500).json({ message: error.message });
+        console.error('Error in actualizar:', error);
+        res.status(error instanceof zod_1.z.ZodError ? 400 : 500).json({ success: false, message: error.message });
     }
 };
 exports.actualizar = actualizar;
@@ -90,10 +100,12 @@ const eliminar = async (req, res) => {
         const rawId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
         const { id } = marcas_schema_1.marcaIdSchema.parse({ id: parseInt(rawId) });
         const result = await service.deleteMarca(id);
-        res.json(result);
+        console.log('eliminar result:', result);
+        res.json({ success: true, data: result });
     }
     catch (error) {
-        res.status(error instanceof zod_1.z.ZodError ? 400 : 500).json({ message: error.message });
+        console.error('Error in eliminar:', error);
+        res.status(error instanceof zod_1.z.ZodError ? 400 : 500).json({ success: false, message: error.message });
     }
 };
 exports.eliminar = eliminar;

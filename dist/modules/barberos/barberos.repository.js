@@ -27,17 +27,21 @@ const getBarberoById = async (id) => {
 exports.getBarberoById = getBarberoById;
 const createBarbero = async (data) => {
     const { id_usuario, tipo_contrato, porcentaje_ganancia, hora_inicio, hora_fin } = data;
+    const idResult = await database_1.pool.request().query("SELECT ISNULL(MAX(id_barbero), 0) + 1 AS nextId FROM Barberos");
+    const id_barbero = idResult.recordset[0].nextId;
     await database_1.pool
         .request()
+        .input("id_barbero", id_barbero)
         .input("id_usuario", id_usuario)
         .input("tipo_contrato", tipo_contrato)
         .input("porcentaje_ganancia", porcentaje_ganancia || null)
         .input("hora_inicio", hora_inicio || "14:00")
         .input("hora_fin", hora_fin || "18:00")
         .query(`
-      INSERT INTO Barberos (id_usuario, tipo_contrato, porcentaje_ganancia, hora_inicio, hora_fin)
-      VALUES (@id_usuario, @tipo_contrato, @porcentaje_ganancia, @hora_inicio, @hora_fin)
+      INSERT INTO Barberos (id_barbero, id_usuario, tipo_contrato, porcentaje_ganancia, hora_inicio, hora_fin)
+      VALUES (@id_barbero, @id_usuario, @tipo_contrato, @porcentaje_ganancia, @hora_inicio, @hora_fin)
     `);
+    return id_barbero;
 };
 exports.createBarbero = createBarbero;
 const updateBarbero = async (id, data) => {

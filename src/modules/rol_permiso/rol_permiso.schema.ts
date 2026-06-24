@@ -6,6 +6,8 @@ export const rolPermisoSchema = z.object({
 });
 
 export const createRolPermisoSchema = rolPermisoSchema;
+export const updateRolPermisoSchema = rolPermisoSchema;
 
 export type RolPermiso = z.infer<typeof rolPermisoSchema>;
 export type CreateRolPermiso = z.infer<typeof createRolPermisoSchema>;
+export type UpdateRolPermiso = z.infer<typeof updateRolPermisoSchema>;

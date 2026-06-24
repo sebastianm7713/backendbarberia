@@ -8,6 +8,8 @@ const database_1 = require("./config/database");
 const env_1 = require("./config/env");
 const auth_routes_1 = __importDefault(require("./modules/auth/auth.routes"));
 const usuarios_routes_1 = __importDefault(require("./modules/usuarios/usuarios.routes"));
+const dashboard_routes_1 = __importDefault(require("./modules/dashboard/dashboard.routes"));
+const productos_routes_1 = __importDefault(require("./modules/productos/productos.routes"));
 const servicios_routes_1 = __importDefault(require("./modules/servicios/servicios.routes"));
 const ventas_routes_1 = __importDefault(require("./modules/ventas/ventas.routes"));
 const compras_routes_1 = __importDefault(require("./modules/compras/compras.routes"));
@@ -28,6 +30,11 @@ const detalle_venta_producto_routes_1 = __importDefault(require("./modules/detal
 const detalle_venta_servicio_routes_1 = __importDefault(require("./modules/detalle_venta_servicio/detalle_venta_servicio.routes"));
 const rol_permiso_routes_1 = __importDefault(require("./modules/rol_permiso/rol_permiso.routes"));
 const devoluciones_routes_1 = __importDefault(require("./modules/devoluciones/devoluciones.routes"));
+const detalle_compra_route_1 = __importDefault(require("./modules/detalle_compra/detalle_compra.route"));
+const pagos_realizados_routes_1 = __importDefault(require("./modules/pagos_realizados/pagos_realizados.routes"));
+const pagos_ventas_routes_1 = __importDefault(require("./modules/pagos_ventas/pagos_ventas.routes"));
+const configuracion_landing_routes_1 = __importDefault(require("./modules/configuracion_landing/configuracion_landing.routes"));
+const estado_venta_routes_1 = __importDefault(require("./modules/estado_venta/estado_venta.routes"));
 app_1.default.use("/api/auth", auth_routes_1.default);
 app_1.default.use("/api/usuarios", usuarios_routes_1.default);
 app_1.default.use("/api/servicios", servicios_routes_1.default);
@@ -41,15 +48,23 @@ app_1.default.use("/api/barberos", barberos_routes_1.default);
 app_1.default.use("/api/tipos-documento", tipo_documento_routes_1.default);
 app_1.default.use("/api/marcas", marcas_routes_1.default);
 app_1.default.use("/api/categorias-productos", categorias_productos_routes_1.default);
+app_1.default.use("/api/dashboard", dashboard_routes_1.default);
+app_1.default.use("/api/productos", productos_routes_1.default);
 app_1.default.use("/api/alquiler-silla", alquiler_silla_routes_1.default);
 app_1.default.use("/api/disponibilidad-excepcion", disponibilidad_excepcion_routes_1.default);
 app_1.default.use("/api/permisos", permisos_routes_1.default);
 app_1.default.use("/api/devoluciones-proveedor", devoluciones_proveedor_routes_1.default);
 app_1.default.use("/api/consignaciones-proveedor", consignaciones_proveedor_routes_1.default);
 app_1.default.use("/api/detalle-venta-producto", detalle_venta_producto_routes_1.default);
+app_1.default.use("/api/detalle_venta_producto", detalle_venta_producto_routes_1.default); // Alias para compatibilidad con frontend
 app_1.default.use("/api/detalle-venta-servicio", detalle_venta_servicio_routes_1.default);
 app_1.default.use("/api/rol-permiso", rol_permiso_routes_1.default);
 app_1.default.use("/api/devoluciones", devoluciones_routes_1.default);
+app_1.default.use("/api/detalle-compra", detalle_compra_route_1.default);
+app_1.default.use("/api/pagos-realizados", pagos_realizados_routes_1.default);
+app_1.default.use("/api/pagos-ventas", pagos_ventas_routes_1.default);
+app_1.default.use("/api/configuracion-landing", configuracion_landing_routes_1.default);
+app_1.default.use("/api/estado-venta", estado_venta_routes_1.default);
 const start = async () => {
     await (0, database_1.connectDB)();
     app_1.default.listen(env_1.env.PORT, () => {

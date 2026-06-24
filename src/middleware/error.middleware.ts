@@ -6,9 +6,12 @@ export const errorHandler = (
   res: Response,
   next: NextFunction
 ) => {
-  console.error(err);
+  console.error('Error middleware captured:', err);
 
-  res.status(400).json({
-    message: err.message || "Error interno del servidor",
+  const statusCode = err?.statusCode || 500;
+  res.status(statusCode).json({
+    success: false,
+    message: err?.message || "Error interno del servidor",
+    error: err?.details || err?.stack || null,
   });
 };

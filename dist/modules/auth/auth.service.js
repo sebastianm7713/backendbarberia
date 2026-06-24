@@ -36,11 +36,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.login = exports.register = void 0;
+exports.resetPassword = exports.validateResetToken = exports.forgotPassword = exports.login = exports.register = void 0;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
+const crypto_1 = __importDefault(require("crypto"));
 const env_1 = require("../../config/env");
 const repo = __importStar(require("./auth.repository"));
+const mailer_1 = require("../../utils/mailer");
 const register = async (data) => {
     return repo.createUser(data);
 };
@@ -49,12 +51,26 @@ const login = async (email, password) => {
     const user = await repo.findUserByEmail(email);
     if (!user)
         throw new Error("Usuario no encontrado");
-    const valid = await bcrypt_1.default.compare(password, user.password);
+    let valid = false;
+    if (typeof user.password === "string" && user.password.startsWith("$2")) {
+        valid = await bcrypt_1.default.compare(password, user.password);
+    }
+    else {
+        valid = user.password === password;
+    }
     if (!valid)
         throw new Error("Contraseña incorrecta");
-    // traer permisos del rol
     const permisos = await repo.getPermisosByRol(user.rol_id);
-    const payload = { id: user.id_usuario, rol: user.rol_id, permisos };
+    const rolName = await repo.getRolNameById(user.rol_id);
+    console.log('🔵 Login para usuario:', user.email, 'rol_id:', user.rol_id);
+    console.log('📋 Permisos cargados de BD:', permisos);
+    const payload = {
+        id: user.id_usuario,
+        rol: user.rol_id,
+        rol_nombre: rolName,
+        nombre_rol: rolName,
+        permisos,
+    };
     const token = jsonwebtoken_1.default.sign(payload, env_1.env.JWT_SECRET, { expiresIn: "8h" });
     return {
         token,
@@ -63,8 +79,60 @@ const login = async (email, password) => {
             nombre: user.nombre,
             email: user.email,
             id_rol: user.rol_id,
+            nombre_rol: rolName,
             permisos,
+            img: user.img ?? null,
+            telefono: user.telefono ?? null,
+            direccion: user.direccion ?? null,
+            estado: user.estado ?? null,
         },
     };
 };
 exports.login = login;
+const forgotPassword = async (email) => {
+    const user = await repo.findUserByEmail(email);
+    if (!user) {
+        throw new Error('Usuario no encontrado');
+    }
+    const token = crypto_1.default.randomBytes(32).toString('hex');
+    const expiresAt = new Date(Date.now() + 3600 * 1000); // 1 hora
+    await repo.createPasswordResetToken(user.id_usuario, token, expiresAt);
+    const emailResult = await (0, mailer_1.sendPasswordResetEmail)(user.email, token);
+    return {
+        message: 'Token de recuperación generado',
+        emailSent: emailResult.smtpConfigured,
+        resetUrl: emailResult.smtpConfigured ? undefined : emailResult.resetUrl,
+    };
+};
+exports.forgotPassword = forgotPassword;
+const validateResetToken = async (token) => {
+    const resetToken = await repo.findResetToken(token);
+    if (!resetToken) {
+        throw new Error('Token inválido');
+    }
+    if (resetToken.used) {
+        throw new Error('Token ya fue usado');
+    }
+    if (new Date(resetToken.expires_at) < new Date()) {
+        throw new Error('Token expirado');
+    }
+    return {
+        valid: true,
+        expiresAt: resetToken.expires_at,
+    };
+};
+exports.validateResetToken = validateResetToken;
+const resetPassword = async (token, password) => {
+    const resetToken = await repo.findResetToken(token);
+    if (!resetToken || resetToken.used) {
+        throw new Error('Token inválido o ya usado');
+    }
+    if (new Date(resetToken.expires_at) < new Date()) {
+        throw new Error('Token expirado');
+    }
+    const hashedPassword = await bcrypt_1.default.hash(password, 10);
+    await repo.updatePassword(resetToken.id_usuario, hashedPassword);
+    await repo.markResetTokenUsed(token);
+    return { message: 'Contraseña restablecida correctamente' };
+};
+exports.resetPassword = resetPassword;

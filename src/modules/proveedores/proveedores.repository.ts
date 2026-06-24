@@ -17,7 +17,17 @@ export const getProveedorById = async (id_proveedor: number) => {
 };
 
 export const createProveedor = async (data: any) => {
-  const { nombre, contacto, telefono, email, direccion } = data;
+  const {
+    id_marca,
+    id_tipo_documento,
+    numero_documento,
+    nombre,
+    representante,
+    telefono,
+    correo,
+    nit,
+    estado,
+  } = data;
 
   const idResult = await pool.request().query(`
     SELECT ISNULL(MAX(id_proveedor), 0) + 1 AS nextId FROM Proveedores
@@ -26,57 +36,81 @@ export const createProveedor = async (data: any) => {
 
   await pool.request()
     .input("id_proveedor", id_proveedor)
+    .input("id_marca", id_marca || null)
+    .input("id_tipo_documento", id_tipo_documento)
+    .input("numero_documento", numero_documento)
     .input("nombre", nombre)
-    .input("contacto", contacto || null)
+    .input("representante", representante || null)
     .input("telefono", telefono || null)
-    .input("email", email || null)
-    .input("direccion", direccion || null)
+    .input("correo", correo || null)
+    .input("nit", nit || null)
+    .input("estado", estado || 'Activo')
     .query(`
-      INSERT INTO Proveedores (id_proveedor, nombre, contacto, telefono, email, direccion)
-      VALUES (@id_proveedor, @nombre, @contacto, @telefono, @email, @direccion)
+      INSERT INTO Proveedores 
+      (id_proveedor, id_marca, id_tipo_documento, numero_documento, nombre, representante, telefono, correo, nit, estado)
+      VALUES 
+      (@id_proveedor, @id_marca, @id_tipo_documento, @numero_documento, @nombre, @representante, @telefono, @correo, @nit, @estado)
     `);
 
   return id_proveedor;
 };
 
 export const updateProveedor = async (id_proveedor: number, data: any) => {
-  const { nombre, contacto, telefono, email, direccion } = data;
+  const {
+    id_marca,
+    id_tipo_documento,
+    numero_documento,
+    nombre,
+    representante,
+    telefono,
+    correo,
+    nit,
+    estado,
+  } = data;
 
-  let query = "UPDATE Proveedores SET ";
-  const params: string[] = [];
-  const inputs: any[] = [];
+  const request = pool.request().input("id_proveedor", id_proveedor);
+  const updates: string[] = [];
 
-  if (nombre !== undefined) {
-    params.push("nombre = @nombre");
-    inputs.push({ name: "nombre", value: nombre });
+  if (id_marca !== undefined) {
+    updates.push("id_marca = @id_marca");
+    request.input("id_marca", id_marca);
   }
-  if (contacto !== undefined) {
-    params.push("contacto = @contacto");
-    inputs.push({ name: "contacto", value: contacto });
+  if (id_tipo_documento !== undefined) {
+    updates.push("id_tipo_documento = @id_tipo_documento");
+    request.input("id_tipo_documento", id_tipo_documento);
+  }
+  if (numero_documento !== undefined) {
+    updates.push("numero_documento = @numero_documento");
+    request.input("numero_documento", numero_documento);
+  }
+  if (nombre !== undefined) {
+    updates.push("nombre = @nombre");
+    request.input("nombre", nombre);
+  }
+  if (representante !== undefined) {
+    updates.push("representante = @representante");
+    request.input("representante", representante);
   }
   if (telefono !== undefined) {
-    params.push("telefono = @telefono");
-    inputs.push({ name: "telefono", value: telefono });
+    updates.push("telefono = @telefono");
+    request.input("telefono", telefono);
   }
-  if (email !== undefined) {
-    params.push("email = @email");
-    inputs.push({ name: "email", value: email });
+  if (correo !== undefined) {
+    updates.push("correo = @correo");
+    request.input("correo", correo);
   }
-  if (direccion !== undefined) {
-    params.push("direccion = @direccion");
-    inputs.push({ name: "direccion", value: direccion });
+  if (nit !== undefined) {
+    updates.push("nit = @nit");
+    request.input("nit", nit);
+  }
+  if (estado !== undefined) {
+    updates.push("estado = @estado");
+    request.input("estado", estado);
   }
 
-  if (params.length === 0) {
-    throw new Error("No fields to update");
-  }
+  if (updates.length === 0) return;
 
-  query += params.join(", ") + " WHERE id_proveedor = @id_proveedor";
-
-  const request = pool.request();
-  inputs.forEach(input => request.input(input.name, input.value));
-  request.input("id_proveedor", id_proveedor);
-
+  const query = `UPDATE Proveedores SET ${updates.join(", ")} WHERE id_proveedor = @id_proveedor`;
   await request.query(query);
 };
 

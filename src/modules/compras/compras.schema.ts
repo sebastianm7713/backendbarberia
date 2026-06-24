@@ -14,8 +14,9 @@ export const createCompraSchema = z.object({
 export const updateCompraSchema = z.object({
   id_proveedor: z.number().int().positive().optional(),
   total: z.number().positive().optional(),
+  estado_pago: z.enum(['pagado', 'pendiente', 'consignacion', 'cancelada']).optional(),
+  fecha_compra: z.string().datetime().optional(),
 });
-
 export const compraIdSchema = z.object({
   id: z.number().int().positive(),
 });

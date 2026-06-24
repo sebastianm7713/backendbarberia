@@ -1,492 +1,990 @@
 {
   "info": {
-    "name": "BarbersiteApp API",
-    "description": "API para el sistema de gestión de barberia",
+    "name": "Barber Site API - Colección Unificada",
+    "description": "API completa para sistema de gestión de barbería con endpoints agrupados por módulo y permisos",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
     {
-      "name": "Auth",
+      "name": "AUTH",
       "item": [
         {
-          "name": "Login",
+          "name": "Login (Todos)",
           "request": {
             "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"email\": \"juanperez@barber.com\",\n  \"password\": \"admin123\"\n}"
-            },
-            "url": {
-              "raw": "http://localhost:4000/api/auth/login",
-              "protocol": "http",
-              "host": ["localhost"],
-              "port": "4000",
-              "path": ["api", "auth", "login"]
-            }
-          },
-          "response": [
-            {
-              "name": "Ejemplo respuesta",
-              "originalRequest": {
-                "method": "POST",
-                "header": [],
-                "body": { "mode": "raw", "raw": "" },
-                "url": {
-                  "raw": "http://localhost:4000/api/auth/login",
-                  "protocol": "http",
-                  "host": ["localhost"],
-                  "port": "4000",
-                  "path": ["api", "auth", "login"]
-                }
-              },
-              "status": "OK",
-              "code": 200,
-              "_body": "{\n  \"token\": \"<JWT>\",\n  \"user\": {\n    \"id_usuario\": 1,\n    \"nombre\": \"Juan Pérez\",\n    \"email\": \"juanperez@barber.com\",\n    \"id_rol\": 1,\n    \"permisos\": [\"ADMIN_TOTAL\"]\n  }\n}"
-            }
-          ]
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"email\": \"juanperez@barber.com\",\n  \"password\": \"Barber123!\"\n}"},
+            "url": {"raw": "http://localhost:4000/api/auth/login", "protocol": "http", "host": ["localhost"], "port": "4000", "path": ["api", "auth", "login"]}
+          }
         },
         {
-          "name": "Permisos actuales",
+          "name": "Register Cliente (Público)",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"nombre\": \"Cliente Nuevo\",\n  \"email\": \"cliente@example.com\",\n  \"telefono\": \"3001234567\",\n  \"direccion\": \"Cra 45 #10-20\",\n  \"contrasena\": \"Password123!\",\n  \"id_tipo_documento\": 1,\n  \"numero_documento\": \"1234567890\"\n}"},
+            "url": {"raw": "http://localhost:4000/api/auth/register", "protocol": "http", "host": ["localhost"], "port": "4000", "path": ["api", "auth", "register"]}
+          }
+        },
+        {
+          "name": "Forgot Password (Público)",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"email\": \"cliente@example.com\"\n}"},
+            "url": {"raw": "http://localhost:4000/api/auth/forgot-password", "protocol": "http", "host": ["localhost"], "port": "4000", "path": ["api", "auth", "forgot-password"]}
+          }
+        },
+        {
+          "name": "Reset Password (Público)",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"token\": \"<TOKEN_RECUPERACION>\",\n  \"contrasena\": \"NuevaPass123!\"\n}"},
+            "url": {"raw": "http://localhost:4000/api/auth/reset-password", "protocol": "http", "host": ["localhost"], "port": "4000", "path": ["api", "auth", "reset-password"]}
+          }
+        },
+        {
+          "name": "Permisos actuales (Todos)",
           "request": {
             "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer TOKEN_AQUI"
-              }
-            ],
-            "url": {
-              "raw": "http://localhost:4000/api/auth/permisos",
-              "protocol": "http",
-              "host": ["localhost"],
-              "port": "4000",
-              "path": ["api", "auth", "permisos"]
-            }
+            "header": [{"key": "Authorization", "value": "Bearer {{adminToken}}"}],
+            "url": {"raw": "http://localhost:4000/api/auth/permisos", "protocol": "http", "host": ["localhost"], "port": "4000", "path": ["api", "auth", "permisos"]}
           }
         }
       ]
     },
     {
-      "name": "Roles",
+      "name": "USUARIOS",
       "item": [
         {
-          "name": "Obtener todos",
+          "name": "GET All Usuarios (ADMIN_TOTAL)",
           "request": {
             "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer TOKEN_AQUI"
-              }
-            ],
-            "url": {
-              "raw": "http://localhost:4000/api/roles",
-              "protocol": "http",
-              "host": ["localhost"],
-              "port": "4000",
-              "path": ["api", "roles"]
-            }
+            "header": [{"key": "Authorization", "value": "Bearer {{adminToken}}"}],
+            "url": {"raw": "http://localhost:4000/api/usuarios", "protocol": "http", "host": ["localhost"], "port": "4000", "path": ["api", "usuarios"]}
           }
         },
         {
-          "name": "Obtener por ID",
+          "name": "GET Usuario by ID (ADMIN_TOTAL)",
           "request": {
             "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer TOKEN_AQUI"
-              }
-            ],
-            "url": {
-              "raw": "http://localhost:4000/api/roles/1",
-              "protocol": "http",
-              "host": ["localhost"],
-              "port": "4000",
-              "path": ["api", "roles", "1"]
-            }
+            "header": [{"key": "Authorization", "value": "Bearer {{adminToken}}"}],
+            "url": {"raw": "http://localhost:4000/api/usuarios/1", "protocol": "http", "host": ["localhost"], "port": "4000", "path": ["api", "usuarios", "1"]}
           }
         },
         {
-          "name": "Crear",
+          "name": "POST Create Usuario (ADMIN_TOTAL)",
           "request": {
             "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer TOKEN_AQUI"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"nombre\": \"Nuevo Rol\",\n  \"descripcion\": \"Descripcion del rol\"\n}"
-            },
-            "url": {
-              "raw": "http://localhost:4000/api/roles",
-              "protocol": "http",
-              "host": ["localhost"],
-              "port": "4000",
-              "path": ["api", "roles"]
-            }
+            "header": [{"key": "Content-Type", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{adminToken}}"}],
+            "body": {"mode": "raw", "raw": "{\n  \"nombre\": \"Nuevo Usuario\",\n  \"email\": \"nuevo@example.com\",\n  \"telefono\": \"3001234567\",\n  \"direccion\": \"Cra 45 #10-20\",\n  \"contrasena\": \"Password123!\",\n  \"id_rol\": 1,\n  \"id_tipo_documento\": 1,\n  \"numero_documento\": \"1234567890\"\n}"},
+            "url": {"raw": "http://localhost:4000/api/usuarios", "protocol": "http", "host": ["localhost"], "port": "4000", "path": ["api", "usuarios"]}
           }
         },
         {
-          "name": "Actualizar",
+          "name": "PUT Update Usuario (ADMIN_TOTAL)",
           "request": {
             "method": "PUT",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer TOKEN_AQUI"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"nombre\": \"Rol Actualizado\"\n}"
-            },
-            "url": {
-              "raw": "http://localhost:4000/api/roles/1",
-              "protocol": "http",
-              "host": ["localhost"],
-              "port": "4000",
-              "path": ["api", "roles", "1"]
-            }
+            "header": [{"key": "Content-Type", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{adminToken}}"}],
+            "body": {"mode": "raw", "raw": "{\n  \"nombre\": \"Usuario Actualizado\",\n  \"telefono\": \"3009876543\"\n}"},
+            "url": {"raw": "http://localhost:4000/api/usuarios/1", "protocol": "http", "host": ["localhost"], "port": "4000", "path": ["api", "usuarios", "1"]}
           }
         },
         {
-          "name": "Eliminar",
+          "name": "DELETE Usuario (ADMIN_TOTAL)",
           "request": {
             "method": "DELETE",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer TOKEN_AQUI"
-              }
-            ],
-            "url": {
-              "raw": "http://localhost:4000/api/roles/1",
-              "protocol": "http",
-              "host": ["localhost"],
-              "port": "4000",
-              "path": ["api", "roles", "1"]
-            }
+            "header": [{"key": "Authorization", "value": "Bearer {{adminToken}}"}],
+            "url": {"raw": "http://localhost:4000/api/usuarios/1", "protocol": "http", "host": ["localhost"], "port": "4000", "path": ["api", "usuarios", "1"]}
           }
         }
       ]
     },
     {
-      "name": "Marcas",
+      "name": "MARCAS",
       "item": [
         {
-          "name": "Obtener todas",
+          "name": "GET All Marcas (Público)",
           "request": {
             "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer TOKEN_AQUI"
-              }
-            ],
-            "url": {
-              "raw": "http://localhost:4000/api/marcas",
-              "protocol": "http",
-              "host": ["localhost"],
-              "port": "4000",
-              "path": ["api", "marcas"]
-            }
+            "header": [],
+            "url": {"raw": "http://localhost:4000/api/marcas", "protocol": "http", "host": ["localhost"], "port": "4000", "path": ["api", "marcas"]}
           }
         },
         {
-          "name": "Crear marca",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer TOKEN_AQUI"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"nombre\": \"Nueva Marca\"\n}"
-            },
-            "url": {
-              "raw": "http://localhost:4000/api/marcas",
-              "protocol": "http",
-              "host": ["localhost"],
-              "port": "4000",
-              "path": ["api", "marcas"]
-            }
-          }
-        }
-      ]
-    },
-    {
-      "name": "Categorias de Productos",
-      "item": [
-        {
-          "name": "Obtener todas",
+          "name": "GET Marca by ID (Público)",
           "request": {
             "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer TOKEN_AQUI"
-              }
-            ],
-            "url": {
-              "raw": "http://localhost:4000/api/categorias-productos",
-              "protocol": "http",
-              "host": ["localhost"],
-              "port": "4000",
-              "path": ["api", "categorias-productos"]
-            }
+            "header": [],
+            "url": {"raw": "http://localhost:4000/api/marcas/1", "protocol": "http", "host": ["localhost"], "port": "4000", "path": ["api", "marcas", "1"]}
           }
         },
         {
-          "name": "Crear categoria",
+          "name": "POST Create Marca (ADMIN_TOTAL)",
           "request": {
             "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer TOKEN_AQUI"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"nombre\": \"Nueva Categoria\",\n  \"descripcion\": \"Descripcion de la categoria\"\n}"
-            },
-            "url": {
-              "raw": "http://localhost:4000/api/categorias-productos",
-              "protocol": "http",
-              "host": ["localhost"],
-              "port": "4000",
-              "path": ["api", "categorias-productos"]
-            }
-          }
-        }
-      ]
-    },
-    {
-      "name": "Clientes",
-      "item": [
-        {
-          "name": "Obtener todos",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer TOKEN_AQUI"
-              }
-            ],
-            "url": {
-              "raw": "http://localhost:4000/api/clientes",
-              "protocol": "http",
-              "host": ["localhost"],
-              "port": "4000",
-              "path": ["api", "clientes"]
-            }
-          }
-        }
-      ]
-    },
-    {
-      "name": "Barberos",
-      "item": [
-        {
-          "name": "Obtener todos",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer TOKEN_AQUI"
-              }
-            ],
-            "url": {
-              "raw": "http://localhost:4000/api/barberos",
-              "protocol": "http",
-              "host": ["localhost"],
-              "port": "4000",
-              "path": ["api", "barberos"]
-            }
+            "header": [{"key": "Content-Type", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{adminToken}}"}],
+            "body": {"mode": "raw", "raw": "{\n  \"nombre\": \"Nueva Marca\"\n}"},
+            "url": {"raw": "http://localhost:4000/api/marcas", "protocol": "http", "host": ["localhost"], "port": "4000", "path": ["api", "marcas"]}
           }
         },
         {
-          "name": "Crear barbero",
+          "name": "PUT Update Marca (ADMIN_TOTAL)",
           "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer TOKEN_AQUI"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"id_usuario\": 2,\n  \"tipo_contrato\": \"porcentaje\",\n  \"porcentaje_ganancia\": 50\n}"
-            },
-            "url": {
-              "raw": "http://localhost:4000/api/barberos",
-              "protocol": "http",
-              "host": ["localhost"],
-              "port": "4000",
-              "path": ["api", "barberos"]
-            }
-          }
-        }
-      ]
-    },
-    {
-      "name": "Compras",
-      "item": [
-        {
-          "name": "Obtener todas",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer TOKEN_AQUI"
-              }
-            ],
-            "url": {
-              "raw": "http://localhost:4000/api/compras",
-              "protocol": "http",
-              "host": ["localhost"],
-              "port": "4000",
-              "path": ["api", "compras"]
-            }
+            "method": "PUT",
+            "header": [{"key": "Content-Type", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{adminToken}}"}],
+            "body": {"mode": "raw", "raw": "{\n  \"nombre\": \"Marca Actualizada\"\n}"},
+            "url": {"raw": "http://localhost:4000/api/marcas/1", "protocol": "http", "host": ["localhost"], "port": "4000", "path": ["api", "marcas", "1"]}
           }
         },
         {
-          "name": "Crear compra",
+          "name": "DELETE Marca (ADMIN_TOTAL)",
+          "request": {
+            "method": "DELETE",
+            "header": [{"key": "Authorization", "value": "Bearer {{adminToken}}"}],
+            "url": {"raw": "http://localhost:4000/api/marcas/1", "protocol": "http", "host": ["localhost"], "port": "4000", "path": ["api", "marcas", "1"]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "CATEGORIAS_PRODUCTOS",
+      "item": [
+        {
+          "name": "GET All Categorias (Público)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {"raw": "http://localhost:4000/api/categorias-productos", "protocol": "http", "host": ["localhost"], "port": "4000", "path": ["api", "categorias-productos"]}
+          }
+        },
+        {
+          "name": "GET Categoria by ID (Público)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {"raw": "http://localhost:4000/api/categorias-productos/1", "protocol": "http", "host": ["localhost"], "port": "4000", "path": ["api", "categorias-productos", "1"]}
+          }
+        },
+        {
+          "name": "POST Create Categoria (ADMIN_TOTAL)",
           "request": {
             "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer TOKEN_AQUI"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"id_proveedor\": 1,\n  \"detalles\": [\n    {\n      \"id_producto\": 1,\n      \"cantidad\": 5,\n      \"costo_unitario\": 15000\n    },\n    {\n      \"id_producto\": 2,\n      \"cantidad\": 3,\n      \"costo_unitario\": 20000\n    }\n  ]\n}"
-            },
-            "url": {
-              "raw": "http://localhost:4000/api/compras",
-              "protocol": "http",
-              "host": ["localhost"],
-              "port": "4000",
-              "path": ["api", "compras"]
-            }
+            "header": [{"key": "Content-Type", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{adminToken}}"}],
+            "body": {"mode": "raw", "raw": "{\n  \"nombre\": \"Nueva Categoria\",\n  \"descripcion\": \"Descripcion de la categoria\",\n  \"estado\": \"Activo\"\n}"},
+            "url": {"raw": "http://localhost:4000/api/categorias-productos", "protocol": "http", "host": ["localhost"], "port": "4000", "path": ["api", "categorias-productos"]}
+          }
+        },
+        {
+          "name": "PUT Update Categoria (ADMIN_TOTAL)",
+          "request": {
+            "method": "PUT",
+            "header": [{"key": "Content-Type", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{adminToken}}"}],
+            "body": {"mode": "raw", "raw": "{\n  \"nombre\": \"Categoria Actualizada\",\n  \"estado\": \"Inactivo\"\n}"},
+            "url": {"raw": "http://localhost:4000/api/categorias-productos/1", "protocol": "http", "host": ["localhost"], "port": "4000", "path": ["api", "categorias-productos", "1"]}
+          }
+        },
+        {
+          "name": "DELETE Categoria (ADMIN_TOTAL)",
+          "request": {
+            "method": "DELETE",
+            "header": [{"key": "Authorization", "value": "Bearer {{adminToken}}"}],
+            "url": {"raw": "http://localhost:4000/api/categorias-productos/1", "protocol": "http", "host": ["localhost"], "port": "4000", "path": ["api", "categorias-productos", "1"]}
           }
         }
       ]
     },
     {
-      "name": "Alquiler Silla",
+      "name": "CLIENTES",
       "item": [
         {
-          "name": "Obtener todos",
+          "name": "GET All Clientes (ADMIN_TOTAL, VER_CLIENTES)",
           "request": {
             "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer TOKEN_AQUI"
-              }
-            ],
-            "url": {
-              "raw": "http://localhost:4000/api/alquiler-silla",
-              "protocol": "http",
-              "host": ["localhost"],
-              "port": "4000",
-              "path": ["api", "alquiler-silla"]
-            }
+            "header": [{"key": "Authorization", "value": "Bearer {{adminToken}}"}],
+            "url": {"raw": "http://localhost:4000/api/clientes", "protocol": "http", "host": ["localhost"], "port": "4000", "path": ["api", "clientes"]}
+          },
+          "response": [{
+            "name": "Success Response",
+            "originalRequest": {"method": "GET"},
+            "status": "OK",
+            "code": 200,
+            "_postman_previewlanguage": "json",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": "{\"success\": true, \"data\": [{\"id_ventas\": 1, \"fecha\": \"2024-01-15T10:30:00.000Z\", \"total\": 28000, \"cliente\": \"Juan Perez\"}, {\"id_ventas\": 2, \"fecha\": \"2024-01-14T14:20:00.000Z\", \"total\": 35000, \"cliente\": \"Maria Garcia\"}]}"
+          }]
+        },
+        {
+          "name": "GET Cliente by ID (ADMIN_TOTAL, VER_CLIENTES)",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{adminToken}}"}],
+            "url": {"raw": "http://localhost:4000/api/clientes/1", "protocol": "http", "host": ["localhost"], "port": "4000", "path": ["api", "clientes", "1"]}
+          }
+        },
+        {
+          "name": "POST Create Cliente (ADMIN_TOTAL)",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{adminToken}}"}],
+            "body": {"mode": "raw", "raw": "{\n  \"id_usuario\": 1,\n  \"estado\": \"Activo\"\n}"},
+            "url": {"raw": "http://localhost:4000/api/clientes", "protocol": "http", "host": ["localhost"], "port": "4000", "path": ["api", "clientes"]}
+          }
+        },
+        {
+          "name": "PUT Update Cliente (ADMIN_TOTAL)",
+          "request": {
+            "method": "PUT",
+            "header": [{"key": "Content-Type", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{adminToken}}"}],
+            "body": {"mode": "raw", "raw": "{\n  \"estado\": \"Activo\"\n}"},
+            "url": {"raw": "http://localhost:4000/api/clientes/1", "protocol": "http", "host": ["localhost"], "port": "4000", "path": ["api", "clientes", "1"]}
+          }
+        },
+        {
+          "name": "DELETE Cliente (ADMIN_TOTAL)",
+          "request": {
+            "method": "DELETE",
+            "header": [{"key": "Authorization", "value": "Bearer {{adminToken}}"}],
+            "url": {"raw": "http://localhost:4000/api/clientes/1", "protocol": "http", "host": ["localhost"], "port": "4000", "path": ["api", "clientes", "1"]}
           }
         }
       ]
     },
     {
-      "name": "Disponibilidad Excepcion",
+      "name": "VENTAS",
       "item": [
         {
-          "name": "Obtener todas",
+          "name": "GET All Ventas (ADMIN_TOTAL, BARBERO)",
           "request": {
             "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer TOKEN_AQUI"
-              }
-            ],
-            "url": {
-              "raw": "http://localhost:4000/api/disponibilidad-excepcion",
-              "protocol": "http",
-              "host": ["localhost"],
-              "port": "4000",
-              "path": ["api", "disponibilidad-excepcion"]
-            }
+            "header": [{"key": "Authorization", "value": "Bearer {{adminToken}}"}],
+            "url": {"raw": "http://localhost:4000/api/ventas", "protocol": "http", "host": ["localhost"], "port": "4000", "path": ["api", "ventas"]}
+          }
+        },
+        {
+          "name": "GET Venta by ID (ADMIN_TOTAL, BARBERO)",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{adminToken}}"}],
+            "url": {"raw": "http://localhost:4000/api/ventas/1", "protocol": "http", "host": ["localhost"], "port": "4000", "path": ["api", "ventas", "1"]}
+          }
+        },
+        {
+          "name": "POST Create Venta (ADMIN_TOTAL, BARBERO)",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{adminToken}}"}],
+            "body": {"mode": "raw", "raw": "{\n  \"id_cliente\": 1,\n  \"id_barbero\": 1,\n  \"id_estado\": 1,\n  \"fecha\": \"2026-04-09\",\n  \"productos\": [\n    {\n      \"id_producto\": 1,\n      \"cantidad\": 2,\n      \"precio_unitario\": 25000\n    }\n  ],\n  \"servicios\": [\n    {\n      \"id_servicio\": 1,\n      \"id_barbero\": 1,\n      \"cantidad\": 1,\n      \"precio_unitario\": 35000,\n      \"porcentaje_barbero\": 30\n    }\n  ]\n}"},
+            "url": {"raw": "http://localhost:4000/api/ventas", "protocol": "http", "host": ["localhost"], "port": "4000", "path": ["api", "ventas"]}
+          }
+        },
+        {
+          "name": "PUT Update Venta - Cambiar a Cancelada (ADMIN_TOTAL)",
+          "request": {
+            "method": "PUT",
+            "header": [{"key": "Content-Type", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{adminToken}}"}],
+            "body": {"mode": "raw", "raw": "{\n  \"id_estado\": 3\n}"},
+            "url": {"raw": "http://localhost:4000/api/ventas/1", "protocol": "http", "host": ["localhost"], "port": "4000", "path": ["api", "ventas", "1"]}
+          }
+        },
+        {
+          "name": "PUT Update Venta - Cambiar a Pagada (ADMIN_TOTAL)",
+          "request": {
+            "method": "PUT",
+            "header": [{"key": "Content-Type", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{adminToken}}"}],
+            "body": {"mode": "raw", "raw": "{\n  \"id_estado\": 2\n}"},
+            "url": {"raw": "http://localhost:4000/api/ventas/1", "protocol": "http", "host": ["localhost"], "port": "4000", "path": ["api", "ventas", "1"]}
+          }
+        },
+        {
+          "name": "DELETE Venta (ADMIN_TOTAL)",
+          "request": {
+            "method": "DELETE",
+            "header": [{"key": "Authorization", "value": "Bearer {{adminToken}}"}],
+            "url": {"raw": "http://localhost:4000/api/ventas/1", "protocol": "http", "host": ["localhost"], "port": "4000", "path": ["api", "ventas", "1"]}
           }
         }
       ]
     },
     {
-      "name": "Permisos",
+      "name": "ESTADO_VENTA",
       "item": [
         {
-          "name": "Obtener todos",
+          "name": "GET All Estados Venta (ADMIN_TOTAL, BARBERO)",
           "request": {
             "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer TOKEN_AQUI"
-              }
-            ],
-            "url": {
-              "raw": "http://localhost:4000/api/permisos",
-              "protocol": "http",
-              "host": ["localhost"],
-              "port": "4000",
-              "path": ["api", "permisos"]
-            }
+            "header": [{"key": "Authorization", "value": "Bearer {{adminToken}}"}],
+            "url": {"raw": "http://localhost:4000/api/estado-venta", "protocol": "http", "host": ["localhost"], "port": "4000", "path": ["api", "estado-venta"]}
+          }
+        },
+        {
+          "name": "GET Estado Venta by ID (ADMIN_TOTAL, BARBERO)",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{adminToken}}"}],
+            "url": {"raw": "http://localhost:4000/api/estado-venta/1", "protocol": "http", "host": ["localhost"], "port": "4000", "path": ["api", "estado-venta", "1"]}
           }
         }
       ]
+    },
+    {
+      "name": "PRODUCTOS",
+      "item": [
+        {
+          "name": "GET All Productos (Público)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {"raw": "http://localhost:4000/api/productos", "protocol": "http", "host": ["localhost"], "port": "4000", "path": ["api", "productos"]}
+          }
+        },
+        {
+          "name": "GET Producto by ID (Público)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {"raw": "http://localhost:4000/api/productos/1", "protocol": "http", "host": ["localhost"], "port": "4000", "path": ["api", "productos", "1"]}
+          }
+        },
+        {
+          "name": "POST Create Producto (ADMIN_TOTAL)",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{adminToken}}"}],
+            "body": {"mode": "raw", "raw": "{\n  \"nombre\": \"Nuevo Producto\",\n  \"descripcion\": \"Descripcion del producto\",\n  \"precio\": 25000,\n  \"stock\": 50,\n  \"id_categoria\": 1,\n  \"id_marca\": 1,\n  \"tipo_adquisicion\": \"compra_directa\"\n}"},
+            "url": {"raw": "http://localhost:4000/api/productos", "protocol": "http", "host": ["localhost"], "port": "4000", "path": ["api", "productos"]}
+          }
+        },
+        {
+          "name": "POST Create Producto por Consignación (ADMIN_TOTAL)",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{adminToken}}"}],
+            "body": {"mode": "raw", "raw": "{\n  \"nombre\": \"Producto en Consignación\",\n  \"descripcion\": \"Producto recibido en consignación del proveedor\",\n  \"precio\": 35000,\n  \"stock\": 20,\n  \"id_categoria\": 1,\n  \"id_marca\": 1,\n  \"tipo_adquisicion\": \"consignacion\",\n  \"id_proveedor\": 1,\n  \"consignacion_data\": {\n    \"cantidad_recibida\": 20,\n    \"precio_proveedor\": 28000,\n    \"precio_venta\": 35000,\n    \"fecha_entrega\": \"2024-01-15\",\n    \"observaciones\": \"Producto de alta calidad, consignación por 30 días\"\n  }\n}"},
+            "url": {"raw": "http://localhost:4000/api/productos", "protocol": "http", "host": ["localhost"], "port": "4000", "path": ["api", "productos"]}
+          }
+        },
+        {
+          "name": "PUT Update Producto (ADMIN_TOTAL)",
+          "request": {
+            "method": "PUT",
+            "header": [{"key": "Content-Type", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{adminToken}}"}],
+            "body": {"mode": "raw", "raw": "{\n  \"nombre\": \"Producto Actualizado\",\n  \"precio\": 30000,\n  \"cantidad_stock\": 45\n}"},
+            "url": {"raw": "http://localhost:4000/api/productos/1", "protocol": "http", "host": ["localhost"], "port": "4000", "path": ["api", "productos", "1"]}
+          }
+        },
+        {
+          "name": "DELETE Producto (ADMIN_TOTAL)",
+          "request": {
+            "method": "DELETE",
+            "header": [{"key": "Authorization", "value": "Bearer {{adminToken}}"}],
+            "url": {"raw": "http://localhost:4000/api/productos/1", "protocol": "http", "host": ["localhost"], "port": "4000", "path": ["api", "productos", "1"]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "CONSIGNACIONES_PROVEEDOR",
+      "item": [
+        {
+          "name": "GET All Consignaciones (ADMIN_TOTAL)",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{adminToken}}"}],
+            "url": {"raw": "http://localhost:4000/api/consignaciones-proveedor", "protocol": "http", "host": ["localhost"], "port": "4000", "path": ["api", "consignaciones-proveedor"]}
+          }
+        },
+        {
+          "name": "GET Consignacion by ID (ADMIN_TOTAL)",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{adminToken}}"}],
+            "url": {"raw": "http://localhost:4000/api/consignaciones-proveedor/1", "protocol": "http", "host": ["localhost"], "port": "4000", "path": ["api", "consignaciones-proveedor", "1"]}
+          }
+        },
+        {
+          "name": "POST Create Consignacion (ADMIN_TOTAL)",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{adminToken}}"}],
+            "body": {"mode": "raw", "raw": "{\n  \"id_proveedor\": 1,\n  \"id_producto\": 1,\n  \"cantidad_recibida\": 50,\n  \"precio_proveedor\": 25000,\n  \"precio_venta\": 35000,\n  \"fecha_entrega\": \"2024-01-15\",\n  \"observaciones\": \"Consignación inicial del proveedor\"\n}"},
+            "url": {"raw": "http://localhost:4000/api/consignaciones-proveedor", "protocol": "http", "host": ["localhost"], "port": "4000", "path": ["api", "consignaciones-proveedor"]}
+          }
+        },
+        {
+          "name": "PUT Update Consignacion (ADMIN_TOTAL)",
+          "request": {
+            "method": "PUT",
+            "header": [{"key": "Content-Type", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{adminToken}}"}],
+            "body": {"mode": "raw", "raw": "{\n  \"cantidad_vendida\": 10,\n  \"estado\": \"pagado\",\n  \"fecha_pago\": \"2024-01-20\",\n  \"observaciones\": \"Pago realizado al proveedor\"\n}"},
+            "url": {"raw": "http://localhost:4000/api/consignaciones-proveedor/1", "protocol": "http", "host": ["localhost"], "port": "4000", "path": ["api", "consignaciones-proveedor", "1"]}
+          }
+        },
+        {
+          "name": "DELETE Consignacion (ADMIN_TOTAL)",
+          "request": {
+            "method": "DELETE",
+            "header": [{"key": "Authorization", "value": "Bearer {{adminToken}}"}],
+            "url": {"raw": "http://localhost:4000/api/consignaciones-proveedor/1", "protocol": "http", "host": ["localhost"], "port": "4000", "path": ["api", "consignaciones-proveedor", "1"]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "SERVICIOS",
+      "item": [
+        {
+          "name": "GET All Servicios (Público)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {"raw": "http://localhost:4000/api/servicios", "protocol": "http", "host": ["localhost"], "port": "4000", "path": ["api", "servicios"]}
+          }
+        },
+        {
+          "name": "GET Servicio by ID (Público)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {"raw": "http://localhost:4000/api/servicios/1", "protocol": "http", "host": ["localhost"], "port": "4000", "path": ["api", "servicios", "1"]}
+          }
+        },
+        {
+          "name": "POST Create Servicio (ADMIN_TOTAL)",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{adminToken}}"}],
+            "body": {"mode": "raw", "raw": "{\n  \"nombre\": \"Nuevo Servicio\",\n  \"descripcion\": \"Descripcion del servicio\",\n  \"duracion\": 30,\n  \"precio\": 35000,\n  \"porcentaje_barbero\": 30,\n  \"img\": \"https://example.com/image.jpg\"\n}"},
+            "url": {"raw": "http://localhost:4000/api/servicios", "protocol": "http", "host": ["localhost"], "port": "4000", "path": ["api", "servicios"]}
+          }
+        },
+        {
+          "name": "PUT Update Servicio (ADMIN_TOTAL)",
+          "request": {
+            "method": "PUT",
+            "header": [{"key": "Content-Type", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{adminToken}}"}],
+            "body": {"mode": "raw", "raw": "{\n  \"nombre\": \"Servicio Actualizado\",\n  \"precio\": 40000,\n  \"img\": \"https://example.com/updated-image.jpg\"\n}"},
+            "url": {"raw": "http://localhost:4000/api/servicios/1", "protocol": "http", "host": ["localhost"], "port": "4000", "path": ["api", "servicios", "1"]}
+          }
+        },
+        {
+          "name": "DELETE Servicio (ADMIN_TOTAL)",
+          "request": {
+            "method": "DELETE",
+            "header": [{"key": "Authorization", "value": "Bearer {{adminToken}}"}],
+            "url": {"raw": "http://localhost:4000/api/servicios/1", "protocol": "http", "host": ["localhost"], "port": "4000", "path": ["api", "servicios", "1"]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "COMPRAS",
+      "item": [
+        {
+          "name": "GET All Compras (ADMIN_TOTAL, ENCARGADO_ALMACEN)",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{adminToken}}"}],
+            "url": {"raw": "http://localhost:4000/api/compras", "protocol": "http", "host": ["localhost"], "port": "4000", "path": ["api", "compras"]}
+          }
+        },
+        {
+          "name": "GET Compra by ID (ADMIN_TOTAL, ENCARGADO_ALMACEN)",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{adminToken}}"}],
+            "url": {"raw": "http://localhost:4000/api/compras/1", "protocol": "http", "host": ["localhost"], "port": "4000", "path": ["api", "compras", "1"]}
+          }
+        },
+        {
+          "name": "POST Create Compra (ADMIN_TOTAL, ENCARGADO_ALMACEN)",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{adminToken}}"}],
+            "body": {"mode": "raw", "raw": "{\n  \"id_proveedor\": 1,\n  \"detalles\": [\n    {\n      \"id_producto\": 1,\n      \"cantidad\": 5,\n      \"costo_unitario\": 15000\n    },\n    {\n      \"id_producto\": 2,\n      \"cantidad\": 3,\n      \"costo_unitario\": 20000\n    }\n  ]\n}"},
+            "url": {"raw": "http://localhost:4000/api/compras", "protocol": "http", "host": ["localhost"], "port": "4000", "path": ["api", "compras"]}
+          }
+        },
+        {
+          "name": "PUT Update Compra (ADMIN_TOTAL, ENCARGADO_ALMACEN)",
+          "request": {
+            "method": "PUT",
+            "header": [{"key": "Content-Type", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{adminToken}}"}],
+            "body": {"mode": "raw", "raw": "{\n  \"id_proveedor\": 1,\n  \"total\": 550000\n}"},
+            "url": {"raw": "http://localhost:4000/api/compras/1", "protocol": "http", "host": ["localhost"], "port": "4000", "path": ["api", "compras", "1"]}
+          }
+        },
+        {
+          "name": "DELETE Compra (ADMIN_TOTAL, ENCARGADO_ALMACEN)",
+          "request": {
+            "method": "DELETE",
+            "header": [{"key": "Authorization", "value": "Bearer {{adminToken}}"}],
+            "url": {"raw": "http://localhost:4000/api/compras/1", "protocol": "http", "host": ["localhost"], "port": "4000", "path": ["api", "compras", "1"]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "DETALLE_COMPRA",
+      "item": [
+        {
+          "name": "GET All Detalles Compra (ADMIN_TOTAL, ENCARGADO_ALMACEN)",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{adminToken}}"}],
+            "url": {"raw": "http://localhost:4000/api/detalle-compra", "protocol": "http", "host": ["localhost"], "port": "4000", "path": ["api", "detalle-compra"]}
+          }
+        },
+        {
+          "name": "GET Detalle Compra by ID (ADMIN_TOTAL, ENCARGADO_ALMACEN)",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{adminToken}}"}],
+            "url": {"raw": "http://localhost:4000/api/detalle-compra/1", "protocol": "http", "host": ["localhost"], "port": "4000", "path": ["api", "detalle-compra", "1"]}
+          }
+        },
+        {
+          "name": "GET Detalles by ID Compra (ADMIN_TOTAL, ENCARGADO_ALMACEN)",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{adminToken}}"}],
+            "url": {"raw": "http://localhost:4000/api/detalle-compra/compra/1", "protocol": "http", "host": ["localhost"], "port": "4000", "path": ["api", "detalle-compra", "compra", "1"]}
+          }
+        },
+        {
+          "name": "POST Create Detalle Compra (ADMIN_TOTAL, ENCARGADO_ALMACEN)",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{adminToken}}"}],
+            "body": {"mode": "raw", "raw": "{\n  \"id_compra\": 1,\n  \"id_producto\": 1,\n  \"cantidad\": 5,\n  \"costo_unitario\": 15000,\n  \"subtotal\": 75000\n}"},
+            "url": {"raw": "http://localhost:4000/api/detalle-compra", "protocol": "http", "host": ["localhost"], "port": "4000", "path": ["api", "detalle-compra"]}
+          }
+        },
+        {
+          "name": "PUT Update Detalle Compra (ADMIN_TOTAL, ENCARGADO_ALMACEN)",
+          "request": {
+            "method": "PUT",
+            "header": [{"key": "Content-Type", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{adminToken}}"}],
+            "body": {"mode": "raw", "raw": "{\n  \"cantidad\": 10,\n  \"costo_unitario\": 15000\n}"},
+            "url": {"raw": "http://localhost:4000/api/detalle-compra/1", "protocol": "http", "host": ["localhost"], "port": "4000", "path": ["api", "detalle-compra", "1"]}
+          }
+        },
+        {
+          "name": "DELETE Detalle Compra (ADMIN_TOTAL, ENCARGADO_ALMACEN)",
+          "request": {
+            "method": "DELETE",
+            "header": [{"key": "Authorization", "value": "Bearer {{adminToken}}"}],
+            "url": {"raw": "http://localhost:4000/api/detalle-compra/1", "protocol": "http", "host": ["localhost"], "port": "4000", "path": ["api", "detalle-compra", "1"]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "DEVOLUCIONES",
+      "item": [
+        {
+          "name": "GET All Devoluciones (ADMIN_TOTAL)",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{adminToken}}"}],
+            "url": {"raw": "http://localhost:4000/api/devoluciones", "protocol": "http", "host": ["localhost"], "port": "4000", "path": ["api", "devoluciones"]}
+          }
+        },
+        {
+          "name": "GET Devolucion by ID",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{adminToken}}"}],
+            "url": {"raw": "http://localhost:4000/api/devoluciones/1", "protocol": "http", "host": ["localhost"], "port": "4000", "path": ["api", "devoluciones", "1"]}
+          }
+        },
+        {
+          "name": "POST Create Devolucion (ADMIN_TOTAL)",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{adminToken}}"}],
+            "body": {"mode": "raw", "raw": "{\n  \"id_detalle_producto\": 1,\n  \"cantidad\": 2,\n  \"motivo\": \"Producto defectuoso\",\n  \"remitido\": \"stock\"\n}"},
+            "url": {"raw": "http://localhost:4000/api/devoluciones", "protocol": "http", "host": ["localhost"], "port": "4000", "path": ["api", "devoluciones"]}
+          }
+        },
+        {
+          "name": "PUT Update Devolucion (ADMIN_TOTAL)",
+          "request": {
+            "method": "PUT",
+            "header": [{"key": "Content-Type", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{adminToken}}"}],
+            "body": {"mode": "raw", "raw": "{\n  \"cantidad\": 1,\n  \"motivo\": \"Cambio solicitado\",\n  \"remitido\": \"proveedor\"\n}"},
+            "url": {"raw": "http://localhost:4000/api/devoluciones/1", "protocol": "http", "host": ["localhost"], "port": "4000", "path": ["api", "devoluciones", "1"]}
+          }
+        },
+        {
+          "name": "DELETE Devolucion (ADMIN_TOTAL)",
+          "request": {
+            "method": "DELETE",
+            "header": [{"key": "Authorization", "value": "Bearer {{adminToken}}"}],
+            "url": {"raw": "http://localhost:4000/api/devoluciones/1", "protocol": "http", "host": ["localhost"], "port": "4000", "path": ["api", "devoluciones", "1"]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "CITAS",
+      "item": [
+        {
+          "name": "GET All Citas (ADMIN_TOTAL, BARBERO, VER_CITAS_PROPIAS)",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{adminToken}}"}],
+            "url": {"raw": "http://localhost:4000/api/citas", "protocol": "http", "host": ["localhost"], "port": "4000", "path": ["api", "citas"]}
+          }
+        },
+        {
+          "name": "GET Cita by ID",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{adminToken}}"}],
+            "url": {"raw": "http://localhost:4000/api/citas/1", "protocol": "http", "host": ["localhost"], "port": "4000", "path": ["api", "citas", "1"]}
+          }
+        },
+        {
+          "name": "POST Create Cita (ADMIN_TOTAL, BARBERO, CLIENTE)",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{adminToken}}"}],
+            "body": {"mode": "raw", "raw": "{\n  \"id_cliente\": 1,\n  \"id_barbero\": 1,\n  \"id_servicio\": 1,\n  \"fecha\": \"2025-03-15\",\n  \"hora\": \"14:00\",\n  \"estado\": \"pendiente\"\n}"},
+            "url": {"raw": "http://localhost:4000/api/citas", "protocol": "http", "host": ["localhost"], "port": "4000", "path": ["api", "citas"]}
+          }
+        },
+        {
+          "name": "POST Create Cita Landing (Invitado)",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"id_barbero\": 1,\n  \"id_servicio\": 1,\n  \"fecha\": \"2025-03-15\",\n  \"hora\": \"14:00\",\n  \"guest_nombre\": \"Cliente Invitado\",\n  \"guest_email\": \"invitado@example.com\",\n  \"guest_telefono\": \"3001234567\"\n}"},
+            "url": {"raw": "http://localhost:4000/api/citas/landing", "protocol": "http", "host": ["localhost"], "port": "4000", "path": ["api", "citas", "landing"]}
+          }
+        },
+        {
+          "name": "GET Disponibilidad Landing (Público)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {"raw": "http://localhost:4000/api/citas/landing/disponibilidad/horario?id_barbero=1&fecha=2025-03-15", "protocol": "http", "host": ["localhost"], "port": "4000", "path": ["api", "citas", "landing", "disponibilidad", "horario"], "query": [{"key": "id_barbero", "value": "1"}, {"key": "fecha", "value": "2025-03-15"}]}
+          }
+        },
+        {
+          "name": "PUT Update Cita (ADMIN_TOTAL, BARBERO)",
+          "request": {
+            "method": "PUT",
+            "header": [{"key": "Content-Type", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{adminToken}}"}],
+            "body": {"mode": "raw", "raw": "{\n  \"id_cliente\": 1,\n  \"id_barbero\": 1,\n  \"id_servicio\": 2,\n  \"fecha\": \"2026-04-08\",\n  \"hora\": \"16:15\",\n  \"estado\": \"pendiente\"\n}"},
+            "url": {"raw": "http://localhost:4000/api/citas/1", "protocol": "http", "host": ["localhost"], "port": "4000", "path": ["api", "citas", "1"]}
+          }
+        },
+        {
+          "name": "PUT Set Cita en_ejecucion (ADMIN_TOTAL, BARBERO)",
+          "request": {
+            "method": "PUT",
+            "header": [{"key": "Content-Type", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{adminToken}}"}],
+            "body": {"mode": "raw", "raw": "{\n  \"estado\": \"en_ejecucion\"\n}"},
+            "url": {"raw": "http://localhost:4000/api/citas/1", "protocol": "http", "host": ["localhost"], "port": "4000", "path": ["api", "citas", "1"]}
+          }
+        },
+        {
+          "name": "DELETE Cita (ADMIN_TOTAL)",
+          "request": {
+            "method": "DELETE",
+            "header": [{"key": "Authorization", "value": "Bearer {{adminToken}}"}],
+            "url": {"raw": "http://localhost:4000/api/citas/1", "protocol": "http", "host": ["localhost"], "port": "4000", "path": ["api", "citas", "1"]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "PROVEEDORES",
+      "item": [
+        {
+          "name": "GET All Proveedores (ADMIN_TOTAL, ENCARGADO_ALMACEN)",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{adminToken}}"}],
+            "url": {"raw": "http://localhost:4000/api/proveedores", "protocol": "http", "host": ["localhost"], "port": "4000", "path": ["api", "proveedores"]}
+          }
+        },
+        {
+          "name": "GET Proveedor by ID",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{adminToken}}"}],
+            "url": {"raw": "http://localhost:4000/api/proveedores/1", "protocol": "http", "host": ["localhost"], "port": "4000", "path": ["api", "proveedores", "1"]}
+          }
+        },
+        {
+          "name": "POST Create Proveedor (ADMIN_TOTAL, ENCARGADO_ALMACEN)",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{adminToken}}"}],
+            "body": {"mode": "raw", "raw": "{\n  \"nombre\": \"Nuevo Proveedor\",\n  \"contacto\": \"Juan Proveedor\",\n  \"telefono\": \"3001234567\",\n  \"email\": \"proveedor@example.com\"\n}"},
+            "url": {"raw": "http://localhost:4000/api/proveedores", "protocol": "http", "host": ["localhost"], "port": "4000", "path": ["api", "proveedores"]}
+          }
+        },
+        {
+          "name": "PUT Update Proveedor (ADMIN_TOTAL, ENCARGADO_ALMACEN)",
+          "request": {
+            "method": "PUT",
+            "header": [{"key": "Content-Type", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{adminToken}}"}],
+            "body": {"mode": "raw", "raw": "{\n  \"nombre\": \"Proveedor Actualizado\",\n  \"telefono\": \"3009876543\"\n}"},
+            "url": {"raw": "http://localhost:4000/api/proveedores/1", "protocol": "http", "host": ["localhost"], "port": "4000", "path": ["api", "proveedores", "1"]}
+          }
+        },
+        {
+          "name": "DELETE Proveedor (ADMIN_TOTAL)",
+          "request": {
+            "method": "DELETE",
+            "header": [{"key": "Authorization", "value": "Bearer {{adminToken}}"}],
+            "url": {"raw": "http://localhost:4000/api/proveedores/1", "protocol": "http", "host": ["localhost"], "port": "4000", "path": ["api", "proveedores", "1"]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "ROLES",
+      "item": [
+        {
+          "name": "GET All Roles (ADMIN_TOTAL)",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{adminToken}}"}],
+            "url": {"raw": "http://localhost:4000/api/roles", "protocol": "http", "host": ["localhost"], "port": "4000", "path": ["api", "roles"]}
+          }
+        },
+        {
+          "name": "GET Rol by ID (ADMIN_TOTAL)",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{adminToken}}"}],
+            "url": {"raw": "http://localhost:4000/api/roles/1", "protocol": "http", "host": ["localhost"], "port": "4000", "path": ["api", "roles", "1"]}
+          }
+        },
+        {
+          "name": "POST Create Rol (ADMIN_TOTAL)",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{adminToken}}"}],
+            "body": {"mode": "raw", "raw": "{\n  \"nombre\": \"Nuevo Rol\",\n  \"descripcion\": \"Descripcion del rol\"\n}"},
+            "url": {"raw": "http://localhost:4000/api/roles", "protocol": "http", "host": ["localhost"], "port": "4000", "path": ["api", "roles"]}
+          }
+        },
+        {
+          "name": "PUT Update Rol (ADMIN_TOTAL)",
+          "request": {
+            "method": "PUT",
+            "header": [{"key": "Content-Type", "value": "application/json"}, {"key": "Authorization", "value": "Bearer {{adminToken}}"}],
+            "body": {"mode": "raw", "raw": "{\n  \"nombre\": \"Rol Actualizado\"\n}"},
+            "url": {"raw": "http://localhost:4000/api/roles/1", "protocol": "http", "host": ["localhost"], "port": "4000", "path": ["api", "roles", "1"]}
+          }
+        },
+        {
+          "name": "DELETE Rol (ADMIN_TOTAL)",
+          "request": {
+            "method": "DELETE",
+            "header": [{"key": "Authorization", "value": "Bearer {{adminToken}}"}],
+            "url": {"raw": "http://localhost:4000/api/roles/1", "protocol": "http", "host": ["localhost"], "port": "4000", "path": ["api", "roles", "1"]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "PERMISOS",
+      "item": [
+        {
+          "name": "GET All Permisos (ADMIN_TOTAL)",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{adminToken}}"}],
+            "url": {"raw": "http://localhost:4000/api/permisos", "protocol": "http", "host": ["localhost"], "port": "4000", "path": ["api", "permisos"]}
+          }
+        },
+        {
+          "name": "GET Permiso by ID (ADMIN_TOTAL)",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{adminToken}}"}],
+            "url": {"raw": "http://localhost:4000/api/permisos/1", "protocol": "http", "host": ["localhost"], "port": "4000", "path": ["api", "permisos", "1"]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "DASHBOARD",
+      "item": [
+        {
+          "name": "GET Dashboard Today KPIs (ADMIN_TOTAL, BARBERO)",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{adminToken}}"}],
+            "url": {"raw": "http://localhost:4000/api/dashboard/hoy", "protocol": "http", "host": ["localhost"], "port": "4000", "path": ["api", "dashboard", "hoy"]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "PAGOS_REALIZADOS",
+      "item": [
+        {
+          "name": "GET All Pagos (ADMIN_TOTAL, ENCARGADO_ALMACEN) - Con filtro estado",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{adminToken}}"}],
+            "url": {"raw": "http://localhost:4000/api/pagos-realizados?estado_pago=pagado", "protocol": "http", "host": ["localhost"], "port": "4000", "path": ["api", "pagos-realizados"], "query": [{"key": "estado_pago", "value": "pagado", "description": "Filtro: pagado, consignacion, pendiente"}]}
+          }
+        },
+        {
+          "name": "GET Pago by ID (ADMIN_TOTAL, ENCARGADO_ALMACEN)",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{adminToken}}"}],
+            "url": {"raw": "http://localhost:4000/api/pagos-realizados/1", "protocol": "http", "host": ["localhost"], "port": "4000", "path": ["api", "pagos-realizados", "1"]}
+          }
+        },
+        {
+          "name": "POST Create Pago (ADMIN_TOTAL)",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Authorization", "value": "Bearer {{adminToken}}"}, {"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"id_compra\": 1,\n  \"monto_pagado\": 450000,\n  \"fecha_pago\": \"2024-01-15T10:30:00Z\",\n  \"metodo_pago\": \"Transferencia\",\n  \"referencia\": \"REF-001\"\n}"},
+            "url": {"raw": "http://localhost:4000/api/pagos-realizados", "protocol": "http", "host": ["localhost"], "port": "4000", "path": ["api", "pagos-realizados"]}
+          }
+        },
+        {
+          "name": "POST Create Pago Consignación Mensual (ADMIN_TOTAL)",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Authorization", "value": "Bearer {{adminToken}}"}, {"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"id_compra\": 2,\n  \"monto_pagado\": 250000,\n  \"fecha_pago\": \"2024-02-15T10:30:00Z\",\n  \"metodo_pago\": \"Efectivo\",\n  \"referencia\": \"CONSIGNACION-FEB-2024\"\n}"},
+            "url": {"raw": "http://localhost:4000/api/pagos-realizados/consignacion/registrar", "protocol": "http", "host": ["localhost"], "port": "4000", "path": ["api", "pagos-realizados", "consignacion", "registrar"]}
+          }
+        },
+        {
+          "name": "PUT Update Pago (ADMIN_TOTAL)",
+          "request": {
+            "method": "PUT",
+            "header": [{"key": "Authorization", "value": "Bearer {{adminToken}}"}, {"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"monto_pagado\": 500000,\n  \"metodo_pago\": \"Efectivo\",\n  \"referencia\": \"REF-001-UPDATED\"\n}"},
+            "url": {"raw": "http://localhost:4000/api/pagos-realizados/1", "protocol": "http", "host": ["localhost"], "port": "4000", "path": ["api", "pagos-realizados", "1"]}
+          }
+        },
+        {
+          "name": "DELETE Pago (ADMIN_TOTAL)",
+          "request": {
+            "method": "DELETE",
+            "header": [{"key": "Authorization", "value": "Bearer {{adminToken}}"}],
+            "url": {"raw": "http://localhost:4000/api/pagos-realizados/1", "protocol": "http", "host": ["localhost"], "port": "4000", "path": ["api", "pagos-realizados", "1"]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "PAGOS_VENTAS",
+      "item": [
+        {
+          "name": "GET All Pagos Ventas (ADMIN_TOTAL, BARBERO)",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{adminToken}}"}],
+            "url": {"raw": "http://localhost:4000/api/pagos-ventas", "protocol": "http", "host": ["localhost"], "port": "4000", "path": ["api", "pagos-ventas"]}
+          }
+        },
+        {
+          "name": "GET Pagos Ventas by venta ID (ADMIN_TOTAL, BARBERO)",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{adminToken}}"}],
+            "url": {"raw": "http://localhost:4000/api/pagos-ventas?id_venta=1", "protocol": "http", "host": ["localhost"], "port": "4000", "path": ["api", "pagos-ventas"], "query": [{"key": "id_venta", "value": "1"}]}
+          }
+        },
+        {
+          "name": "GET Pago Venta by ID (ADMIN_TOTAL, BARBERO)",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{adminToken}}"}],
+            "url": {"raw": "http://localhost:4000/api/pagos-ventas/1", "protocol": "http", "host": ["localhost"], "port": "4000", "path": ["api", "pagos-ventas", "1"]}
+          }
+        },
+        {
+          "name": "POST Create Pago Venta (ADMIN_TOTAL)",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Authorization", "value": "Bearer {{adminToken}}"}, {"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"id_venta\": 1,\n  \"monto_pagado\": 35000,\n  \"fecha_pago\": \"2026-04-09T12:00:00Z\",\n  \"metodo_pago\": \"Efectivo\",\n  \"referencia\": \"FACT-001\"\n}"},
+            "url": {"raw": "http://localhost:4000/api/pagos-ventas", "protocol": "http", "host": ["localhost"], "port": "4000", "path": ["api", "pagos-ventas"]}
+          }
+        },
+        {
+          "name": "PUT Update Pago Venta (ADMIN_TOTAL)",
+          "request": {
+            "method": "PUT",
+            "header": [{"key": "Authorization", "value": "Bearer {{adminToken}}"}, {"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"monto_pagado\": 40000,\n  \"metodo_pago\": \"Transferencia\",\n  \"referencia\": \"FACT-001-UPDATED\"\n}"},
+            "url": {"raw": "http://localhost:4000/api/pagos-ventas/1", "protocol": "http", "host": ["localhost"], "port": "4000", "path": ["api", "pagos-ventas", "1"]}
+          }
+        },
+        {
+          "name": "DELETE Pago Venta (ADMIN_TOTAL)",
+          "request": {
+            "method": "DELETE",
+            "header": [{"key": "Authorization", "value": "Bearer {{adminToken}}"}],
+            "url": {"raw": "http://localhost:4000/api/pagos-ventas/1", "protocol": "http", "host": ["localhost"], "port": "4000", "path": ["api", "pagos-ventas", "1"]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "CONFIGURACION LANDING",
+      "item": [
+        {
+          "name": "GET Configuración (Público)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {"raw": "http://localhost:4000/api/configuracion-landing", "protocol": "http", "host": ["localhost"], "port": "4000", "path": ["api", "configuracion-landing"]}
+          }
+        },
+        {
+          "name": "POST Crear Configuración (ADMIN_TOTAL)",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Authorization", "value": "Bearer {{adminToken}}"}, {"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"logo_url\": \"https://ejemplo.com/logo.png\",\n  \"nombre_negocio\": \"Barbería Elite\",\n  \"descripcion_negocio\": \"Barbería profesional con servicios de calidad\",\n  \"imagen_fondo_hero\": \"/images/hero-background.svg\",\n  \"titulo_hero\": \"Bienvenido a Barbería Elite\",\n  \"subtitulo_hero\": \"Servicios profesionales de barbería\",\n  \"texto_boton_hero\": \"Reservar Cita\",\n  \"enlace_boton_hero\": \"/citas\",\n  \"imagen_servicios\": \"/images/servicios.jpg\",\n  \"imagen_fondo_about\": \"/images/about-bg.jpg\",\n  \"imagen_nosotros\": \"/images/nosotros.jpg\",\n  \"titulo_about\": \"Sobre Nosotros\",\n  \"descripcion_about\": \"Somos expertos en barbería con más de 10 años de experiencia\",\n  \"estadistica1_numero\": 500,\n  \"estadistica1_texto\": \"Clientes Satisfechos\",\n  \"estadistica2_numero\": 15,\n  \"estadistica2_texto\": \"Años de Experiencia\",\n  \"estadistica3_numero\": 25,\n  \"estadistica3_texto\": \"Barberos Profesionales\",\n  \"estadistica4_numero\": 4.9,\n  \"estadistica4_texto\": \"Calificación\",\n  \"telefono\": \"+57 300 1234567\",\n  \"email\": \"contacto@barberia-elite.com\",\n  \"direccion\": \"Calle 10 # 5-20, Bogotá\",\n  \"horario\": \"Lunes a Viernes: 8am - 6pm, Sábado: 9am - 5pm\",\n  \"facebook\": \"https://facebook.com/barberia-elite\",\n  \"instagram\": \"https://instagram.com/barberia-elite\",\n  \"whatsapp\": \"+57 300 1234567\"\n}"},
+            "url": {"raw": "http://localhost:4000/api/configuracion-landing", "protocol": "http", "host": ["localhost"], "port": "4000", "path": ["api", "configuracion-landing"]}
+          }
+        },
+        {
+          "name": "PUT Actualizar Configuración (ADMIN_TOTAL)",
+          "request": {
+            "method": "PUT",
+            "header": [{"key": "Authorization", "value": "Bearer {{adminToken}}"}, {"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"titulo_hero\": \"Barbería Elite - Servicios Premium\",\n  \"subtitulo_hero\": \"Experiencia y profesionalismo garantizado\",\n  \"email\": \"nuevo-email@barberia-elite.com\",\n  \"telefono\": \"+57 300 9876543\"\n}"},
+            "url": {"raw": "http://localhost:4000/api/configuracion-landing/1", "protocol": "http", "host": ["localhost"], "port": "4000", "path": ["api", "configuracion-landing", "1"]}
+          }
+        },
+        {
+          "name": "DELETE Configuración (ADMIN_TOTAL)",
+          "request": {
+            "method": "DELETE",
+            "header": [{"key": "Authorization", "value": "Bearer {{adminToken}}"}],
+            "url": {"raw": "http://localhost:4000/api/configuracion-landing/1", "protocol": "http", "host": ["localhost"], "port": "4000", "path": ["api", "configuracion-landing", "1"]}
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "adminToken",
+      "value": "",
+      "type": "string",
+      "description": "JWT token de autenticación - obtener del endpoint Login"
     }
   ]
 }

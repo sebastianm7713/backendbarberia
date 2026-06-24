@@ -16,14 +16,9 @@ const getProductoById = async (id) => {
 };
 exports.getProductoById = getProductoById;
 const createProducto = async (data) => {
-    const { id_categoria, id_marca, nombre, precio, descripcion, stock, fecha_vencimiento, img, } = data;
-    const idResult = await database_1.pool
+    const { id_categoria, id_marca, nombre, precio, descripcion, stock, fecha_vencimiento, img, estado, tipo_adquisicion, id_proveedor, } = data;
+    const result = await database_1.pool
         .request()
-        .query("SELECT ISNULL(MAX(id_producto), 0) + 1 AS nextId FROM Productos");
-    const id_producto = idResult.recordset[0].nextId;
-    await database_1.pool
-        .request()
-        .input("id_producto", id_producto)
         .input("id_categoria", id_categoria || null)
         .input("id_marca", id_marca || null)
         .input("nombre", nombre)
@@ -32,17 +27,22 @@ const createProducto = async (data) => {
         .input("stock", stock ?? 0)
         .input("fecha_vencimiento", fecha_vencimiento || null)
         .input("img", img || null)
+        .input("estado", estado || 'activo')
+        .input("tipo_adquisicion", tipo_adquisicion || 'compra_directa')
+        .input("id_proveedor", id_proveedor || null)
         .query(`
       INSERT INTO Productos 
-        (id_producto, id_categoria, id_marca, nombre, precio, descripcion, stock, fecha_vencimiento, img)
+        (id_categoria, id_marca, nombre, precio, descripcion, stock, fecha_vencimiento, img, estado, tipo_adquisicion, id_proveedor)
       VALUES 
-        (@id_producto, @id_categoria, @id_marca, @nombre, @precio, @descripcion, @stock, @fecha_vencimiento, @img)
+        (@id_categoria, @id_marca, @nombre, @precio, @descripcion, @stock, @fecha_vencimiento, @img, @estado, @tipo_adquisicion, @id_proveedor);
+      SELECT SCOPE_IDENTITY() AS id_producto;
     `);
+    const id_producto = result.recordset[0].id_producto;
     return { id_producto, mensaje: "Producto creado" };
 };
 exports.createProducto = createProducto;
 const updateProducto = async (id, data) => {
-    const { id_categoria, id_marca, nombre, precio, descripcion, stock, fecha_vencimiento, img, } = data;
+    const { id_categoria, id_marca, nombre, precio, descripcion, stock, fecha_vencimiento, img, estado, tipo_adquisicion, id_proveedor, } = data;
     const request = database_1.pool.request().input("id", id);
     const updates = [];
     if (id_categoria !== undefined) {
@@ -76,6 +76,18 @@ const updateProducto = async (id, data) => {
     if (img !== undefined) {
         updates.push("img = @img");
         request.input("img", img);
+    }
+    if (estado !== undefined) {
+        updates.push("estado = @estado");
+        request.input("estado", estado);
+    }
+    if (tipo_adquisicion !== undefined) {
+        updates.push("tipo_adquisicion = @tipo_adquisicion");
+        request.input("tipo_adquisicion", tipo_adquisicion);
+    }
+    if (id_proveedor !== undefined) {
+        updates.push("id_proveedor = @id_proveedor");
+        request.input("id_proveedor", id_proveedor);
     }
     if (updates.length === 0)
         return;

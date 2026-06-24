@@ -11,15 +11,20 @@ exports.createUsuarioSchema = zod_1.z.object({
     telefono: zod_1.z.string().max(30).optional(),
     direccion: zod_1.z.string().max(250).optional(),
     contrasena: zod_1.z.string().min(6),
-    img: zod_1.z.string().max(250).optional(),
+    img: zod_1.z.string().max(1000000).optional(),
+    estado: zod_1.z.enum(['activo', 'inactivo']).optional().default('activo'),
 });
 exports.updateUsuarioSchema = zod_1.z.object({
     id_rol: zod_1.z.number().int().positive().optional(),
+    id_tipo_documento: zod_1.z.number().int().positive().optional(),
+    numero_documento: zod_1.z.string().min(1).max(50).optional(),
     nombre: zod_1.z.string().min(1).max(150).optional(),
     email: zod_1.z.string().email().max(150).optional(),
     telefono: zod_1.z.string().max(30).optional(),
     direccion: zod_1.z.string().max(250).optional(),
-    img: zod_1.z.string().max(250).optional(),
+    contrasena: zod_1.z.string().min(6).optional(),
+    img: zod_1.z.string().max(1000000).optional(),
+    estado: zod_1.z.enum(['activo', 'inactivo']).optional(),
 });
 exports.usuarioIdSchema = zod_1.z.object({
     id: zod_1.z.number().int().positive(),

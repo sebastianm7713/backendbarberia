@@ -33,8 +33,8 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createServicio = exports.getServicios = void 0;
-const serviciosRepository = __importStar(require("./services.repository"));
+exports.deleteServicio = exports.updateServicio = exports.getServicioById = exports.createServicio = exports.getServicios = void 0;
+const serviciosRepository = __importStar(require("./servicios.repository"));
 const getServicios = async () => {
     return await serviciosRepository.getServicios();
 };
@@ -43,3 +43,15 @@ const createServicio = async (data) => {
     return await serviciosRepository.createServicio(data);
 };
 exports.createServicio = createServicio;
+const getServicioById = async (id) => {
+    return await serviciosRepository.getServicioById(id);
+};
+exports.getServicioById = getServicioById;
+const updateServicio = async (id, data) => {
+    return await serviciosRepository.updateServicio(id, data);
+};
+exports.updateServicio = updateServicio;
+const deleteServicio = async (id) => {
+    return await serviciosRepository.deleteServicio(id);
+};
+exports.deleteServicio = deleteServicio;

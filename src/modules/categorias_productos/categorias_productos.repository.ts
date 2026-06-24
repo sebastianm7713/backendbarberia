@@ -11,7 +11,7 @@ export const getCategoriaById = async (id: number) => {
 };
 
 export const createCategoria = async (data: any) => {
-  const { nombre, descripcion } = data;
+  const { nombre, descripcion, estado } = data;
   const idResult = await pool.request().query("SELECT ISNULL(MAX(id_categoria), 0) + 1 AS nextId FROM Categorias_Productos");
   const id = idResult.recordset[0].nextId;
   
@@ -19,11 +19,12 @@ export const createCategoria = async (data: any) => {
     .input("id", id)
     .input("nombre", nombre)
     .input("descripcion", descripcion || null)
-    .query("INSERT INTO Categorias_Productos (id_categoria, nombre, descripcion) VALUES (@id, @nombre, @descripcion)");
+    .input("estado", estado || 'Activo')
+    .query("INSERT INTO Categorias_Productos (id_categoria, nombre, descripcion, estado) VALUES (@id, @nombre, @descripcion, @estado)");
 };
 
 export const updateCategoria = async (id: number, data: any) => {
-  const { nombre, descripcion } = data;
+  const { nombre, descripcion, estado } = data;
   const updates = [];
   const request = pool.request().input("id", id);
   
@@ -34,6 +35,10 @@ export const updateCategoria = async (id: number, data: any) => {
   if (descripcion !== undefined) {
     updates.push("descripcion = @descripcion");
     request.input("descripcion", descripcion);
+  }
+  if (estado !== undefined) {
+    updates.push("estado = @estado");
+    request.input("estado", estado);
   }
   
   if (updates.length > 0) {

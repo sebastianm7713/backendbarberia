@@ -33,78 +33,101 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.eliminar = exports.actualizar = exports.obtenerPorId = exports.obtenerTodos = exports.crear = void 0;
+exports.eliminar = exports.actualizar = exports.crear = exports.obtenerPorId = exports.obtenerPorEstado = exports.obtenerTodos = void 0;
 const service = __importStar(require("./compras.service"));
 const zod_1 = require("zod");
 const compras_schema_1 = require("./compras.schema");
-const crear = async (req, res) => {
-    try {
-        const validatedData = compras_schema_1.createCompraSchema.parse(req.body);
-        const result = await service.crearCompra(validatedData);
-        res.status(201).json(result);
-    }
-    catch (error) {
-        if (error instanceof zod_1.z.ZodError) {
-            res.status(400).json({ message: "Datos inválidos", errors: error.issues });
-        }
-        else {
-            res.status(500).json({ message: error.message });
-        }
-    }
-};
-exports.crear = crear;
-const obtenerTodos = async (req, res) => {
+const obtenerTodos = async (_, res) => {
     try {
         const compras = await service.getAllCompras();
-        res.json(compras);
+        console.log('obtenerTodos compras result:', compras);
+        res.json({ success: true, data: compras });
     }
     catch (error) {
-        res.status(500).json({ message: error.message });
+        console.error('Error in obtenerTodos:', error);
+        res.status(500).json({ success: false, message: error.message });
     }
 };
 exports.obtenerTodos = obtenerTodos;
+const obtenerPorEstado = async (req, res) => {
+    try {
+        const estado = Array.isArray(req.params.estado) ? req.params.estado[0] : req.params.estado;
+        const compras = await service.getComprasByEstado(estado);
+        console.log('obtenerPorEstado compras result:', compras);
+        res.json({ success: true, data: compras });
+    }
+    catch (error) {
+        console.error('Error in obtenerPorEstado:', error);
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+exports.obtenerPorEstado = obtenerPorEstado;
 const obtenerPorId = async (req, res) => {
     try {
         const rawId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
         const id = parseInt(rawId);
         if (isNaN(id)) {
-            return res.status(400).json({ message: "ID inválido" });
+            return res.status(400).json({ success: false, message: "ID inválido" });
         }
         const { id: validatedId } = compras_schema_1.compraIdSchema.parse({ id });
         const compra = await service.getCompraById(validatedId);
+        console.log('obtenerPorId compra result:', compra);
         if (!compra) {
-            return res.status(404).json({ message: "Compra no encontrada" });
+            return res.status(404).json({ success: false, message: "Compra no encontrada" });
         }
-        res.json(compra);
+        res.json({ success: true, data: compra });
     }
     catch (error) {
+        console.error('Error in obtenerPorId:', error);
         if (error instanceof zod_1.z.ZodError) {
-            res.status(400).json({ message: "ID inválido", errors: error.issues });
+            res.status(400).json({ success: false, message: "ID inválido", errors: error.issues });
         }
         else {
-            res.status(500).json({ message: error.message });
+            res.status(500).json({ success: false, message: error.message });
         }
     }
 };
 exports.obtenerPorId = obtenerPorId;
+const crear = async (req, res) => {
+    try {
+        console.log('crear req.body:', req.body);
+        const validatedData = compras_schema_1.createCompraSchema.parse(req.body);
+        const result = await service.crearCompra(validatedData);
+        console.log('crear result:', result);
+        res.status(201).json({ success: true, data: result });
+    }
+    catch (error) {
+        console.error('Error in crear:', error);
+        if (error instanceof zod_1.z.ZodError) {
+            res.status(400).json({ success: false, message: "Datos inválidos", errors: error.issues });
+        }
+        else {
+            res.status(500).json({ success: false, message: error.message });
+        }
+    }
+};
+exports.crear = crear;
 const actualizar = async (req, res) => {
     try {
         const rawId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
         const id = parseInt(rawId);
         if (isNaN(id)) {
-            return res.status(400).json({ message: "ID inválido" });
+            return res.status(400).json({ success: false, message: "ID inválido" });
         }
         const { id: validatedId } = compras_schema_1.compraIdSchema.parse({ id });
+        console.log('actualizar req.body:', req.body);
         const validatedData = compras_schema_1.updateCompraSchema.parse(req.body);
         const result = await service.updateCompra(validatedId, validatedData);
-        res.json(result);
+        console.log('actualizar result:', result);
+        res.json({ success: true, data: result });
     }
     catch (error) {
+        console.error('Error in actualizar:', error);
         if (error instanceof zod_1.z.ZodError) {
-            res.status(400).json({ message: "Datos inválidos", errors: error.issues });
+            res.status(400).json({ success: false, message: "Datos inválidos", errors: error.issues });
         }
         else {
-            res.status(500).json({ message: error.message });
+            res.status(500).json({ success: false, message: error.message });
         }
     }
 };
@@ -114,18 +137,20 @@ const eliminar = async (req, res) => {
         const rawId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
         const id = parseInt(rawId);
         if (isNaN(id)) {
-            return res.status(400).json({ message: "ID inválido" });
+            return res.status(400).json({ success: false, message: "ID inválido" });
         }
         const { id: validatedId } = compras_schema_1.compraIdSchema.parse({ id });
         const result = await service.deleteCompra(validatedId);
-        res.json(result);
+        console.log('eliminar result:', result);
+        res.json({ success: true, data: result });
     }
     catch (error) {
+        console.error('Error in eliminar:', error);
         if (error instanceof zod_1.z.ZodError) {
-            res.status(400).json({ message: "ID inválido", errors: error.issues });
+            res.status(400).json({ success: false, message: "ID inválido", errors: error.issues });
         }
         else {
-            res.status(500).json({ message: error.message });
+            res.status(500).json({ success: false, message: error.message });
         }
     }
 };

@@ -33,50 +33,108 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.obtenerPorId = exports.actualizarEstado = exports.listar = exports.crear = void 0;
+exports.obtenerHorasDisponibles = exports.eliminar = exports.actualizar = exports.crearDesdeLanding = exports.crear = exports.obtenerPorId = exports.listar = void 0;
 const service = __importStar(require("./citas.service"));
-const crear = async (req, res) => {
+const listar = async (_, res) => {
     try {
-        const result = await service.crearCita(req.body);
-        res.status(201).json(result);
+        const citas = await service.listarCitas();
+        console.log('listar citas result:', citas);
+        res.json({ success: true, data: citas });
     }
     catch (error) {
-        res.status(400).json({ message: error.message });
-    }
-};
-exports.crear = crear;
-const listar = async (_req, res) => {
-    try {
-        const data = await service.listarCitas();
-        res.json(data);
-    }
-    catch (error) {
-        res.status(500).json({ message: error.message });
+        console.error('Error in listar:', error);
+        res.status(500).json({ success: false, message: error.message });
     }
 };
 exports.listar = listar;
-const actualizarEstado = async (req, res) => {
-    try {
-        const rawId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
-        const id = Number(rawId);
-        const { estado } = req.body;
-        const result = await service.cambiarEstado(id, estado);
-        res.json(result);
-    }
-    catch (error) {
-        res.status(500).json({ message: error.message });
-    }
-};
-exports.actualizarEstado = actualizarEstado;
 const obtenerPorId = async (req, res) => {
     try {
         const rawId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
         const id = Number(rawId);
-        const data = await service.obtenerCitaConVenta(id);
-        res.json(data);
+        const cita = await service.obtenerCitaConVenta(id);
+        console.log('obtenerPorId cita result:', cita);
+        if (!cita)
+            return res.status(404).json({ success: false, message: "Cita no encontrada" });
+        res.json({ success: true, data: cita });
     }
     catch (error) {
-        res.status(404).json({ message: error.message });
+        console.error('Error in obtenerPorId:', error);
+        res.status(500).json({ success: false, message: error.message });
     }
 };
 exports.obtenerPorId = obtenerPorId;
+const crear = async (req, res) => {
+    try {
+        console.log('crear req.body:', req.body);
+        const result = await service.crearCita(req.body);
+        console.log('crear result:', result);
+        res.status(201).json({ success: true, data: result });
+    }
+    catch (error) {
+        console.error('Error in crear:', error);
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+exports.crear = crear;
+const crearDesdeLanding = async (req, res) => {
+    try {
+        console.log('crearDesdeLanding req.body:', req.body);
+        const result = await service.crearCita(req.body);
+        console.log('crearDesdeLanding result:', result);
+        res.status(201).json({ success: true, data: result });
+    }
+    catch (error) {
+        console.error('Error in crearDesdeLanding:', error);
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+exports.crearDesdeLanding = crearDesdeLanding;
+const actualizar = async (req, res) => {
+    try {
+        const rawId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+        const id = Number(rawId);
+        console.log('actualizar req.body:', req.body);
+        const result = await service.actualizarCita(id, req.body);
+        console.log('actualizar result:', result);
+        res.json({ success: true, data: result });
+    }
+    catch (error) {
+        console.error('Error in actualizar:', error);
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+exports.actualizar = actualizar;
+const eliminar = async (req, res) => {
+    try {
+        const rawId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+        const id = Number(rawId);
+        console.log('eliminar id:', id);
+        const result = await service.eliminarCita(id);
+        console.log('eliminar result:', result);
+        res.json({ success: true, data: result });
+    }
+    catch (error) {
+        console.error('Error in eliminar:', error);
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+exports.eliminar = eliminar;
+const obtenerHorasDisponibles = async (req, res) => {
+    try {
+        const { id_barbero, fecha } = req.query;
+        if (!id_barbero || !fecha) {
+            return res.status(400).json({ success: false, message: "Parámetros id_barbero y fecha son requeridos" });
+        }
+        const barberoId = Number(id_barbero);
+        const fechaStr = String(fecha);
+        console.log('obtenerHorasDisponibles:', { barberoId, fechaStr });
+        const horas = await service.obtenerHorasDisponibles(barberoId, fechaStr);
+        console.log('horas disponibles:', horas);
+        res.json({ success: true, data: horas });
+    }
+    catch (error) {
+        console.error('Error in obtenerHorasDisponibles:', error);
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+exports.obtenerHorasDisponibles = obtenerHorasDisponibles;

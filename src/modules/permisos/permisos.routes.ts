@@ -1,14 +1,16 @@
 import { Router } from "express";
-import { obtenerTodos, obtenerPorId, crear, actualizar, eliminar } from "./permisos.controller";
+import { obtenerTodos, obtenerPermisosEstructurados, seedPermisosDefault, obtenerPorId, crear, actualizar, eliminar } from "./permisos.controller";
 import { verifyToken } from "../../middleware/auth.middleware";
-import { authorizeRoles } from "../../middleware/role.middleware";
+import { authorizeByModule } from "../../middleware/permission.middleware";
 
 const router = Router();
 
-router.get("/", verifyToken, authorizeRoles(1), obtenerTodos);
-router.get("/:id", verifyToken, authorizeRoles(1), obtenerPorId);
-router.post("/", verifyToken, authorizeRoles(1), crear);
-router.put("/:id", verifyToken, authorizeRoles(1), actualizar);
-router.delete("/:id", verifyToken, authorizeRoles(1), eliminar);
+router.get("/", verifyToken, authorizeByModule('Permisos'), obtenerTodos);
+router.get("/tree", verifyToken, authorizeByModule('Permisos'), obtenerPermisosEstructurados);
+router.post("/seed-defaults", verifyToken, authorizeByModule('Permisos'), seedPermisosDefault);
+router.get("/:id", verifyToken, authorizeByModule('Permisos'), obtenerPorId);
+router.post("/", verifyToken, authorizeByModule('Permisos'), crear);
+router.put("/:id", verifyToken, authorizeByModule('Permisos'), actualizar);
+router.delete("/:id", verifyToken, authorizeByModule('Permisos'), eliminar);
 
 export default router;

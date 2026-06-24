@@ -28,7 +28,7 @@ export const dashboardHoy = async () => {
       ISNULL(SUM(d.ganancia_barbero),0) AS ganancia_barberos
     INTO #ganancia
     FROM Detalle_Venta_Servicio d
-    JOIN Ventas v ON d.id_factura = v.id_factura
+    JOIN Ventas v ON d.id_ventas = v.id_ventas
     WHERE CAST(v.fecha AS DATE) = @hoy;
 
     SELECT 

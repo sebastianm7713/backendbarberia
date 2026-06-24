@@ -39,7 +39,9 @@ exports.detalleVentaProductoService = {
             return await detalle_venta_producto_repository_1.detalleVentaProductoRepository.create(data);
         }
         catch (error) {
-            throw new utils_1.AppError('Error al crear detalle de venta', 500);
+            if (error instanceof utils_1.AppError)
+                throw error;
+            throw new utils_1.AppError(`Error al crear detalle de venta: ${error?.message || 'Error desconocido'}`, 500);
         }
     },
     async update(id_detalle, data) {

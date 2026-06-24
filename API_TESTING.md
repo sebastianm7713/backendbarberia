@@ -49,6 +49,28 @@ Content-Type: application/json
 
 **Copiar el token** y usarlo en todos los siguientes requests.
 
+### 2. Registro de usuario
+
+**Endpoint:**
+```
+POST /api/auth/register
+Content-Type: application/json
+```
+
+**Body (requerido):**
+```json
+{
+  "nombre": "Administrador Test",
+  "email": "admin@test.com",
+  "password": "AdminTest123!",
+  "id_rol": 1,
+  "id_tipo_documento": 1,
+  "numero_documento": "1234567890"
+}
+```
+
+> Nota: id_tipo_documento y numero_documento son obligatorios según el esquema de la base de datos.
+
 ---
 
 ## 📋 Endpoints por Módulo
@@ -270,8 +292,10 @@ curl -X POST http://localhost:4000/api/servicios \
   -d '{
     "nombre": "Corte Premium",
     "descripcion": "Corte con técnica premium",
-    "duracion_minutos": 45,
-    "precio": 50000
+    "duracion": 45,
+    "precio": 50000,
+    "porcentaje_barbero": 30,
+    "img": "https://example.com/image.jpg"
   }'
 ```
 

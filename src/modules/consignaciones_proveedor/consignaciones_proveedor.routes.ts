@@ -1,14 +1,14 @@
 import { Router } from "express";
 import { obtenerTodos, obtenerPorId, crear, actualizar, eliminar } from "./consignaciones_proveedor.controller";
 import { verifyToken } from "../../middleware/auth.middleware";
-import { authorizeRoles } from "../../middleware/role.middleware";
+import { authorizeByModule } from "../../middleware/permission.middleware";
 
 const router = Router();
 
-router.get("/", verifyToken, authorizeRoles(1), obtenerTodos);
-router.get("/:id", verifyToken, authorizeRoles(1), obtenerPorId);
-router.post("/", verifyToken, authorizeRoles(1), crear);
-router.put("/:id", verifyToken, authorizeRoles(1), actualizar);
-router.delete("/:id", verifyToken, authorizeRoles(1), eliminar);
+router.get("/", verifyToken, authorizeByModule('Consignaciones'), obtenerTodos);
+router.get("/:id", verifyToken, authorizeByModule('Consignaciones'), obtenerPorId);
+router.post("/", verifyToken, authorizeByModule('Consignaciones'), crear);
+router.put("/:id", verifyToken, authorizeByModule('Consignaciones'), actualizar);
+router.delete("/:id", verifyToken, authorizeByModule('Consignaciones'), eliminar);
 
 export default router;

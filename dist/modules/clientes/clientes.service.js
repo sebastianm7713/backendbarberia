@@ -33,7 +33,7 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteCliente = exports.updateCliente = exports.createCliente = exports.getClienteById = exports.getAllClientes = void 0;
+exports.deleteCliente = exports.updateCliente = exports.createCliente = exports.getClienteByUsuarioId = exports.getClienteById = exports.getAllClientes = void 0;
 const repository = __importStar(require("./clientes.repository"));
 const getAllClientes = async () => {
     return await repository.getAllClientes();
@@ -43,14 +43,18 @@ const getClienteById = async (id_cliente) => {
     return await repository.getClienteById(id_cliente);
 };
 exports.getClienteById = getClienteById;
+const getClienteByUsuarioId = async (id_usuario) => {
+    return await repository.getClienteByUsuarioId(id_usuario);
+};
+exports.getClienteByUsuarioId = getClienteByUsuarioId;
 const createCliente = async (data) => {
     const id = await repository.createCliente(data);
     return { message: "Cliente creado correctamente", id_cliente: id };
 };
 exports.createCliente = createCliente;
 const updateCliente = async (id_cliente, data) => {
-    await repository.updateCliente(id_cliente, data);
-    return { message: "Cliente actualizado correctamente" };
+    const cliente = await repository.updateCliente(id_cliente, data);
+    return { message: "Cliente actualizado correctamente", ...cliente };
 };
 exports.updateCliente = updateCliente;
 const deleteCliente = async (id_cliente) => {

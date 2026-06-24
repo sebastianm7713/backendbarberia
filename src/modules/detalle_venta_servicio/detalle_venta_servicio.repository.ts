@@ -8,8 +8,8 @@ export const detalleVentaServicioRepository = {
         .request()
         .query(`
           SELECT 
-            dvs.id_detalle,
-            dvs.id_venta,
+            dvs.id_detalle_servicio AS id_detalle,
+            dvs.id_ventas AS id_venta,
             dvs.id_servicio,
             dvs.id_barbero,
             dvs.cantidad,
@@ -17,13 +17,13 @@ export const detalleVentaServicioRepository = {
             dvs.subtotal,
             s.nombre as nombre_servicio,
             s.descripcion,
-            s.duracion_minutos,
+            s.duracion,
             u.nombre as nombre_barbero
           FROM Detalle_Venta_Servicio dvs
           INNER JOIN Servicios s ON dvs.id_servicio = s.id_servicio
           INNER JOIN Barberos b ON dvs.id_barbero = b.id_barbero
           INNER JOIN Usuarios u ON b.id_usuario = u.id_usuario
-          ORDER BY dvs.id_venta DESC
+          ORDER BY dvs.id_ventas DESC
         `);
       return result.recordset;
     } catch (error) {
@@ -38,8 +38,8 @@ export const detalleVentaServicioRepository = {
         .input('id_detalle', id_detalle)
         .query(`
           SELECT 
-            dvs.id_detalle,
-            dvs.id_venta,
+            dvs.id_detalle_servicio AS id_detalle,
+            dvs.id_ventas AS id_venta,
             dvs.id_servicio,
             dvs.id_barbero,
             dvs.cantidad,
@@ -47,13 +47,13 @@ export const detalleVentaServicioRepository = {
             dvs.subtotal,
             s.nombre as nombre_servicio,
             s.descripcion,
-            s.duracion_minutos,
+            s.duracion,
             u.nombre as nombre_barbero
           FROM Detalle_Venta_Servicio dvs
           INNER JOIN Servicios s ON dvs.id_servicio = s.id_servicio
           INNER JOIN Barberos b ON dvs.id_barbero = b.id_barbero
           INNER JOIN Usuarios u ON b.id_usuario = u.id_usuario
-          WHERE dvs.id_detalle = @id_detalle
+          WHERE dvs.id_detalle_servicio = @id_detalle
         `);
       return result.recordset[0] || null;
     } catch (error) {
@@ -68,8 +68,8 @@ export const detalleVentaServicioRepository = {
         .input('id_venta', id_venta)
         .query(`
           SELECT 
-            dvs.id_detalle,
-            dvs.id_venta,
+            dvs.id_detalle_servicio AS id_detalle,
+            dvs.id_ventas AS id_venta,
             dvs.id_servicio,
             dvs.id_barbero,
             dvs.cantidad,
@@ -77,18 +77,19 @@ export const detalleVentaServicioRepository = {
             dvs.subtotal,
             s.nombre as nombre_servicio,
             s.descripcion,
-            s.duracion_minutos,
+            s.duracion,
             u.nombre as nombre_barbero
           FROM Detalle_Venta_Servicio dvs
           INNER JOIN Servicios s ON dvs.id_servicio = s.id_servicio
           INNER JOIN Barberos b ON dvs.id_barbero = b.id_barbero
           INNER JOIN Usuarios u ON b.id_usuario = u.id_usuario
-          WHERE dvs.id_venta = @id_venta
-          ORDER BY dvs.id_detalle
+          WHERE dvs.id_ventas = @id_venta
+          ORDER BY dvs.id_detalle_servicio
         `);
       return result.recordset;
-    } catch (error) {
-      throw new Error(`Error al obtener detalles de servicio: ${error}`);
+    } catch (error: any) {
+      console.error('detalleVentaServicioRepository.getByVentaId error:', error);
+      throw new Error(`Error al obtener detalles de servicio: ${error?.message || error}`);
     }
   },
 
@@ -97,14 +98,14 @@ export const detalleVentaServicioRepository = {
       const subtotal = data.cantidad * data.precio_unitario;
       const maxIdResult = await pool
         .request()
-        .query('SELECT ISNULL(MAX(id_detalle), 0) + 1 as newId FROM Detalle_Venta_Servicio');
+        .query('SELECT ISNULL(MAX(id_detalle_servicio), 0) + 1 as newId FROM Detalle_Venta_Servicio');
 
       const newId = maxIdResult.recordset[0].newId;
 
       await pool
         .request()
-        .input('id_detalle', newId)
-        .input('id_venta', data.id_venta)
+        .input('id_detalle_servicio', newId)
+        .input('id_ventas', data.id_venta)
         .input('id_servicio', data.id_servicio)
         .input('id_barbero', data.id_barbero)
         .input('cantidad', data.cantidad)
@@ -112,8 +113,8 @@ export const detalleVentaServicioRepository = {
         .input('subtotal', subtotal)
         .query(`
           INSERT INTO Detalle_Venta_Servicio 
-          (id_detalle, id_venta, id_servicio, id_barbero, cantidad, precio_unitario, subtotal)
-          VALUES (@id_detalle, @id_venta, @id_servicio, @id_barbero, @cantidad, @precio_unitario, @subtotal)
+          (id_detalle_servicio, id_ventas, id_servicio, id_barbero, cantidad, precio_unitario, subtotal)
+          VALUES (@id_detalle_servicio, @id_ventas, @id_servicio, @id_barbero, @cantidad, @precio_unitario, @subtotal)
         `);
 
       return { id_detalle: newId, ...data, subtotal };
@@ -129,8 +130,8 @@ export const detalleVentaServicioRepository = {
 
       if (data.cantidad !== undefined || data.precio_unitario !== undefined) {
         const existing = await this.getById(id_detalle);
-        const cantidad = data.cantidad || existing.cantidad;
-        const precio = data.precio_unitario || existing.precio_unitario;
+        const cantidad = data.cantidad ?? existing.cantidad;
+        const precio = data.precio_unitario ?? existing.precio_unitario;
         const subtotal = cantidad * precio;
 
         request.input('subtotal', subtotal);
@@ -157,7 +158,7 @@ export const detalleVentaServicioRepository = {
       await request.query(`
         UPDATE Detalle_Venta_Servicio 
         SET ${updates.join(', ')}
-        WHERE id_detalle = @id_detalle
+        WHERE id_detalle_servicio = @id_detalle
       `);
 
       return this.getById(id_detalle);
@@ -171,7 +172,7 @@ export const detalleVentaServicioRepository = {
       await pool
         .request()
         .input('id_detalle', id_detalle)
-        .query('DELETE FROM Detalle_Venta_Servicio WHERE id_detalle = @id_detalle');
+        .query('DELETE FROM Detalle_Venta_Servicio WHERE id_detalle_servicio = @id_detalle');
       return true;
     } catch (error) {
       throw new Error(`Error al eliminar detalle de servicio: ${error}`);

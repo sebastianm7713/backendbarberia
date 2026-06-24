@@ -35,8 +35,9 @@ export const detalleVentaProductoService = {
   async create(data: CreateDetalleVentaProducto) {
     try {
       return await detalleVentaProductoRepository.create(data);
-    } catch (error) {
-      throw new AppError('Error al crear detalle de venta', 500);
+    } catch (error: any) {
+      if (error instanceof AppError) throw error;
+      throw new AppError(`Error al crear detalle de venta: ${error?.message || 'Error desconocido'}`, 500);
     }
   },
 

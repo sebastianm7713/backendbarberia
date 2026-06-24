@@ -9,10 +9,9 @@ export const validate = (schema: ZodSchema) => {
       if (req.body && Object.keys(req.body).length > 0) {
         req.body = schema.parse(req.body); // body can be any
       }
-      if (req.params && Object.keys(req.params).length > 0) {
-        // casting to any resolves ParsedQs mismatch
-        req.params = schema.parse(req.params) as any;
-      }
+      // Only validate params if they exist AND are expected by the schema
+      // Don't validate params by default as they may contain route parameters like :id
+      // that aren't defined in the schema
       if (req.query && Object.keys(req.query).length > 0) {
         req.query = schema.parse(req.query as any) as any;
       }

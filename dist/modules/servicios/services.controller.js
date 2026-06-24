@@ -33,18 +33,96 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createServicio = exports.getServicios = void 0;
-const serviciosService = __importStar(require("./services.service"));
-const getServicios = async (req, res) => {
-    const data = await serviciosService.getServicios();
-    res.json(data);
+exports.deleteServicio = exports.updateServicio = exports.createServicio = exports.getServicioById = exports.getServicios = void 0;
+const service = __importStar(require("./services.service"));
+const zod_1 = require("zod");
+const services_schema_1 = require("./services.schema");
+const getServicios = async (_req, res) => {
+    try {
+        const data = await service.getServicios();
+        res.json(data);
+    }
+    catch (error) {
+        res.status(500).json({ message: error.message });
+    }
 };
 exports.getServicios = getServicios;
+const getServicioById = async (req, res) => {
+    try {
+        const rawId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+        const id = parseInt(rawId);
+        if (isNaN(id))
+            return res.status(400).json({ message: "ID inválido" });
+        const { id: validatedId } = services_schema_1.servicioIdSchema.parse({ id });
+        const servicio = await service.getServicioById(validatedId);
+        if (!servicio)
+            return res.status(404).json({ message: "Servicio no encontrado" });
+        res.json(servicio);
+    }
+    catch (error) {
+        if (error instanceof zod_1.z.ZodError) {
+            res.status(400).json({ message: "ID inválido", errors: error.issues });
+        }
+        else {
+            res.status(500).json({ message: error.message });
+        }
+    }
+};
+exports.getServicioById = getServicioById;
 const createServicio = async (req, res) => {
-    const data = await serviciosService.createServicio(req.body);
-    res.json({
-        message: "Servicio creado",
-        data
-    });
+    try {
+        const validated = services_schema_1.createServicioSchema.parse(req.body);
+        const data = await service.createServicio(validated);
+        res.status(201).json({ message: "Servicio creado", data });
+    }
+    catch (error) {
+        if (error instanceof zod_1.z.ZodError) {
+            res.status(400).json({ message: "Datos inválidos", errors: error.issues });
+        }
+        else {
+            res.status(500).json({ message: error.message });
+        }
+    }
 };
 exports.createServicio = createServicio;
+const updateServicio = async (req, res) => {
+    try {
+        const rawId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+        const id = parseInt(rawId);
+        if (isNaN(id))
+            return res.status(400).json({ message: "ID inválido" });
+        const { id: validatedId } = services_schema_1.servicioIdSchema.parse({ id });
+        const validated = services_schema_1.updateServicioSchema.parse(req.body);
+        const data = await service.updateServicio(validatedId, validated);
+        res.json({ message: "Servicio actualizado", data });
+    }
+    catch (error) {
+        if (error instanceof zod_1.z.ZodError) {
+            res.status(400).json({ message: "Datos inválidos", errors: error.issues });
+        }
+        else {
+            res.status(500).json({ message: error.message });
+        }
+    }
+};
+exports.updateServicio = updateServicio;
+const deleteServicio = async (req, res) => {
+    try {
+        const rawId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+        const id = parseInt(rawId);
+        if (isNaN(id))
+            return res.status(400).json({ message: "ID inválido" });
+        const { id: validatedId } = services_schema_1.servicioIdSchema.parse({ id });
+        await service.deleteServicio(validatedId);
+        res.json({ message: "Servicio eliminado" });
+    }
+    catch (error) {
+        if (error instanceof zod_1.z.ZodError) {
+            res.status(400).json({ message: "ID inválido", errors: error.issues });
+        }
+        else {
+            res.status(500).json({ message: error.message });
+        }
+    }
+};
+exports.deleteServicio = deleteServicio;

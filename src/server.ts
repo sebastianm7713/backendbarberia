@@ -4,6 +4,8 @@ import { env } from "./config/env";
 
 import authRoutes from "./modules/auth/auth.routes";
 import usuariosRoutes from "./modules/usuarios/usuarios.routes";
+import dashboardRoutes from "./modules/dashboard/dashboard.routes";
+import productosRoutes from "./modules/productos/productos.routes";
 import serviciosRoutes from "./modules/servicios/servicios.routes";
 import ventasRoutes from "./modules/ventas/ventas.routes";
 import comprasRoutes from "./modules/compras/compras.routes";
@@ -24,6 +26,11 @@ import detalleVentaProductoRoutes from "./modules/detalle_venta_producto/detalle
 import detalleVentaServicioRoutes from "./modules/detalle_venta_servicio/detalle_venta_servicio.routes";
 import rolPermisoRoutes from "./modules/rol_permiso/rol_permiso.routes";
 import devolucionesRoutes from "./modules/devoluciones/devoluciones.routes";
+import detalleCompraRoutes from "./modules/detalle_compra/detalle_compra.route";
+import pagosRealizadosRoutes from "./modules/pagos_realizados/pagos_realizados.routes";
+import pagosVentasRoutes from "./modules/pagos_ventas/pagos_ventas.routes";
+import configuracionLandingRoutes from "./modules/configuracion_landing/configuracion_landing.routes";
+import estadoVentaRoutes from "./modules/estado_venta/estado_venta.routes";
 
 app.use("/api/auth", authRoutes);
 app.use("/api/usuarios", usuariosRoutes);
@@ -38,15 +45,23 @@ app.use("/api/barberos", barberosRoutes);
 app.use("/api/tipos-documento", tipoDocumentoRoutes);
 app.use("/api/marcas", marcasRoutes);
 app.use("/api/categorias-productos", categoriasProductosRoutes);
+app.use("/api/dashboard", dashboardRoutes);
+app.use("/api/productos", productosRoutes);
 app.use("/api/alquiler-silla", alquilerSillaRoutes);
 app.use("/api/disponibilidad-excepcion", disponibilidadExcepcionRoutes);
 app.use("/api/permisos", permisosRoutes);
 app.use("/api/devoluciones-proveedor", devolucionesProveedorRoutes);
 app.use("/api/consignaciones-proveedor", consignacionesProveedorRoutes);
 app.use("/api/detalle-venta-producto", detalleVentaProductoRoutes);
+app.use("/api/detalle_venta_producto", detalleVentaProductoRoutes); // Alias para compatibilidad con frontend
 app.use("/api/detalle-venta-servicio", detalleVentaServicioRoutes);
 app.use("/api/rol-permiso", rolPermisoRoutes);
 app.use("/api/devoluciones", devolucionesRoutes);
+app.use("/api/detalle-compra", detalleCompraRoutes);
+app.use("/api/pagos-realizados", pagosRealizadosRoutes);
+app.use("/api/pagos-ventas", pagosVentasRoutes);
+app.use("/api/configuracion-landing", configuracionLandingRoutes);
+app.use("/api/estado-venta", estadoVentaRoutes);
 
 const start = async () => {
   await connectDB();

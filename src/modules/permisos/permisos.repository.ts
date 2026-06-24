@@ -22,6 +22,29 @@ export const createPermiso = async (data: any) => {
     .query("INSERT INTO Permisos (id_permiso, nombre, descripcion) VALUES (@id, @nombre, @descripcion)");
 };
 
+export const findPermisoByNombre = async (nombre: string) => {
+  const result = await pool.request()
+    .input("nombre", nombre)
+    .query("SELECT * FROM Permisos WHERE nombre = @nombre");
+  return result.recordset[0];
+};
+
+export const createPermisoIfNotExists = async (data: any) => {
+  const existing = await findPermisoByNombre(data.nombre);
+  if (existing) return existing;
+
+  const idResult = await pool.request().query("SELECT ISNULL(MAX(id_permiso), 0) + 1 AS nextId FROM Permisos");
+  const id = idResult.recordset[0].nextId;
+
+  await pool.request()
+    .input("id", id)
+    .input("nombre", data.nombre)
+    .input("descripcion", data.descripcion)
+    .query("INSERT INTO Permisos (id_permiso, nombre, descripcion) VALUES (@id, @nombre, @descripcion)");
+
+  return { id_permiso: id, nombre: data.nombre, descripcion: data.descripcion };
+};
+
 export const updatePermiso = async (id: number, data: any) => {
   const { nombre, descripcion } = data;
   const updates = [];

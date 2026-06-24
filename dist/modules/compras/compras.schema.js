@@ -13,6 +13,8 @@ exports.createCompraSchema = zod_1.z.object({
 exports.updateCompraSchema = zod_1.z.object({
     id_proveedor: zod_1.z.number().int().positive().optional(),
     total: zod_1.z.number().positive().optional(),
+    estado_pago: zod_1.z.enum(['pagado', 'pendiente', 'consignacion', 'cancelada']).optional(),
+    fecha_compra: zod_1.z.string().datetime().optional(),
 });
 exports.compraIdSchema = zod_1.z.object({
     id: zod_1.z.number().int().positive(),

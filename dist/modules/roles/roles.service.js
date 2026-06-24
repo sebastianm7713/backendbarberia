@@ -33,7 +33,7 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteRol = exports.updateRol = exports.createRol = exports.getRolById = exports.getAllRoles = void 0;
+exports.deleteRol = exports.updateRolEstado = exports.updateRol = exports.createRol = exports.getRolById = exports.getAllRoles = void 0;
 const repository = __importStar(require("./roles.repository"));
 const getAllRoles = async () => {
     return await repository.getAllRoles();
@@ -44,15 +44,22 @@ const getRolById = async (id) => {
 };
 exports.getRolById = getRolById;
 const createRol = async (data) => {
-    await repository.createRol(data);
-    return { message: "Rol creado correctamente" };
+    console.log('Service createRol called with:', data);
+    const result = await repository.createRol(data);
+    console.log('Repository returned:', result);
+    return result;
 };
 exports.createRol = createRol;
 const updateRol = async (id, data) => {
-    await repository.updateRol(id, data);
-    return { message: "Rol actualizado correctamente" };
+    const result = await repository.updateRol(id, data);
+    return result;
 };
 exports.updateRol = updateRol;
+const updateRolEstado = async (id, estado) => {
+    const result = await repository.updateRol(id, { estado });
+    return result;
+};
+exports.updateRolEstado = updateRolEstado;
 const deleteRol = async (id) => {
     await repository.deleteRol(id);
     return { message: "Rol eliminado correctamente" };

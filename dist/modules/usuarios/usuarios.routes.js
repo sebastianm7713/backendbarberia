@@ -35,7 +35,15 @@ var __importStar = (this && this.__importStar) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const controller = __importStar(require("./usuarios.controller"));
+const auth_middleware_1 = require("../../middleware/auth.middleware");
+const permission_middleware_1 = require("../../middleware/permission.middleware");
 const router = (0, express_1.Router)();
-router.get("/", controller.getUsuarios);
-router.post("/", controller.crearUsuario);
+// listing is admin-only
+router.get("/", auth_middleware_1.verifyToken, (0, permission_middleware_1.authorizeByModule)('Usuarios'), controller.getUsuarios);
+router.get("/:id", auth_middleware_1.verifyToken, (0, permission_middleware_1.authorizeByModule)('Usuarios'), controller.obtenerUsuarioPorId);
+// allow registration without auth (if needed)
+router.post("/", auth_middleware_1.verifyToken, (0, permission_middleware_1.authorizeByModule)('Usuarios'), controller.crearUsuario);
+// admin modifications
+router.put("/:id", auth_middleware_1.verifyToken, (0, permission_middleware_1.authorizeByModule)('Usuarios'), controller.actualizarUsuario);
+router.delete("/:id", auth_middleware_1.verifyToken, (0, permission_middleware_1.authorizeByModule)('Usuarios'), controller.eliminarUsuario);
 exports.default = router;

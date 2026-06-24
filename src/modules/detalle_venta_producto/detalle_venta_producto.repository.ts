@@ -1,5 +1,6 @@
 import { pool } from '../../config/database';
 import { CreateDetalleVentaProducto } from './detalle_venta_producto.schema';
+import { AppError } from '../../shared/utils';
 
 export const detalleVentaProductoRepository = {
   async getAll() {
@@ -8,8 +9,8 @@ export const detalleVentaProductoRepository = {
         .request()
         .query(`
           SELECT 
-            dvp.id_detalle,
-            dvp.id_venta,
+            dvp.id_detalle_producto AS id_detalle,
+            dvp.id_ventas AS id_venta,
             dvp.id_producto,
             dvp.cantidad,
             dvp.precio_unitario,
@@ -18,7 +19,7 @@ export const detalleVentaProductoRepository = {
             p.descripcion
           FROM Detalle_Venta_Producto dvp
           INNER JOIN Productos p ON dvp.id_producto = p.id_producto
-          ORDER BY dvp.id_venta DESC
+          ORDER BY dvp.id_ventas DESC
         `);
       return result.recordset;
     } catch (error) {
@@ -33,8 +34,8 @@ export const detalleVentaProductoRepository = {
         .input('id_detalle', id_detalle)
         .query(`
           SELECT 
-            dvp.id_detalle,
-            dvp.id_venta,
+            dvp.id_detalle_producto AS id_detalle,
+            dvp.id_ventas AS id_venta,
             dvp.id_producto,
             dvp.cantidad,
             dvp.precio_unitario,
@@ -43,7 +44,7 @@ export const detalleVentaProductoRepository = {
             p.descripcion
           FROM Detalle_Venta_Producto dvp
           INNER JOIN Productos p ON dvp.id_producto = p.id_producto
-          WHERE dvp.id_detalle = @id_detalle
+          WHERE dvp.id_detalle_producto = @id_detalle
         `);
       return result.recordset[0] || null;
     } catch (error) {
@@ -58,8 +59,8 @@ export const detalleVentaProductoRepository = {
         .input('id_venta', id_venta)
         .query(`
           SELECT 
-            dvp.id_detalle,
-            dvp.id_venta,
+            dvp.id_detalle_producto AS id_detalle,
+            dvp.id_ventas AS id_venta,
             dvp.id_producto,
             dvp.cantidad,
             dvp.precio_unitario,
@@ -68,8 +69,8 @@ export const detalleVentaProductoRepository = {
             p.descripcion
           FROM Detalle_Venta_Producto dvp
           INNER JOIN Productos p ON dvp.id_producto = p.id_producto
-          WHERE dvp.id_venta = @id_venta
-          ORDER BY dvp.id_detalle
+          WHERE dvp.id_ventas = @id_venta
+          ORDER BY dvp.id_detalle_producto
         `);
       return result.recordset;
     } catch (error) {
@@ -79,30 +80,44 @@ export const detalleVentaProductoRepository = {
 
   async create(data: CreateDetalleVentaProducto) {
     try {
+      // Verificar que la venta exista
+      const ventaCheck = await pool
+        .request()
+        .input('id_venta', data.id_venta)
+        .query('SELECT 1 AS existsVenta FROM Ventas WHERE id_ventas = @id_venta');
+
+      if (!ventaCheck.recordset.length) {
+        const err = new Error(`Venta con id_ventas=${data.id_venta} no encontrada`);
+        (err as any).statusCode = 404;
+        throw err;
+      }
+
       const subtotal = data.cantidad * data.precio_unitario;
       const maxIdResult = await pool
         .request()
-        .query('SELECT ISNULL(MAX(id_detalle), 0) + 1 as newId FROM Detalle_Venta_Producto');
+        .query('SELECT ISNULL(MAX(id_detalle_producto), 0) + 1 as newId FROM Detalle_Venta_Producto');
 
       const newId = maxIdResult.recordset[0].newId;
 
       await pool
         .request()
-        .input('id_detalle', newId)
-        .input('id_venta', data.id_venta)
+        .input('id_detalle_producto', newId)
+        .input('id_ventas', data.id_venta)
         .input('id_producto', data.id_producto)
         .input('cantidad', data.cantidad)
         .input('precio_unitario', data.precio_unitario)
         .input('subtotal', subtotal)
         .query(`
           INSERT INTO Detalle_Venta_Producto 
-          (id_detalle, id_venta, id_producto, cantidad, precio_unitario, subtotal)
-          VALUES (@id_detalle, @id_venta, @id_producto, @cantidad, @precio_unitario, @subtotal)
+          (id_detalle_producto, id_ventas, id_producto, cantidad, precio_unitario, subtotal)
+          VALUES (@id_detalle_producto, @id_ventas, @id_producto, @cantidad, @precio_unitario, @subtotal)
         `);
 
       return { id_detalle: newId, ...data, subtotal };
-    } catch (error) {
-      throw new Error(`Error al crear detalle de venta: ${error}`);
+    } catch (error: any) {
+      console.error('Repository create error:', error);
+      if (error instanceof AppError) throw error;
+      throw new AppError(`Error al crear detalle de venta: ${error?.message || error}`, 500);
     }
   },
 
@@ -136,7 +151,7 @@ export const detalleVentaProductoRepository = {
       await request.query(`
         UPDATE Detalle_Venta_Producto 
         SET ${updates.join(', ')}
-        WHERE id_detalle = @id_detalle
+        WHERE id_detalle_producto = @id_detalle
       `);
 
       return this.getById(id_detalle);
@@ -150,7 +165,7 @@ export const detalleVentaProductoRepository = {
       await pool
         .request()
         .input('id_detalle', id_detalle)
-        .query('DELETE FROM Detalle_Venta_Producto WHERE id_detalle = @id_detalle');
+        .query('DELETE FROM Detalle_Venta_Producto WHERE id_detalle_producto = @id_detalle');
       return true;
     } catch (error) {
       throw new Error(`Error al eliminar detalle de venta: ${error}`);

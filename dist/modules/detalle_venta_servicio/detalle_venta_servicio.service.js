@@ -27,11 +27,14 @@ exports.detalleVentaServicioService = {
         }
     },
     async getByVentaId(id_venta) {
+        if (Number.isNaN(id_venta)) {
+            throw new utils_1.AppError('ID de venta inválido', 400);
+        }
         try {
             return await detalle_venta_servicio_repository_1.detalleVentaServicioRepository.getByVentaId(id_venta);
         }
         catch (error) {
-            throw new utils_1.AppError('Error al obtener detalles de servicio', 500);
+            throw new utils_1.AppError(`Error al obtener detalles de servicio: ${error?.message || error}`, 500);
         }
     },
     async create(data) {

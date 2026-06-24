@@ -25,10 +25,14 @@ export const detalleVentaServicioService = {
   },
 
   async getByVentaId(id_venta: number) {
+    if (Number.isNaN(id_venta)) {
+      throw new AppError('ID de venta inválido', 400);
+    }
+
     try {
       return await detalleVentaServicioRepository.getByVentaId(id_venta);
-    } catch (error) {
-      throw new AppError('Error al obtener detalles de servicio', 500);
+    } catch (error: any) {
+      throw new AppError(`Error al obtener detalles de servicio: ${error?.message || error}`, 500);
     }
   },
 

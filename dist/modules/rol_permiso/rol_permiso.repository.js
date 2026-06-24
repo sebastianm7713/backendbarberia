@@ -11,10 +11,9 @@ exports.rolPermisoRepository = {
           SELECT 
             rp.id_rol,
             rp.id_permiso,
-            r.nombre as nombre_rol,
-            r.descripcion as descripcion_rol,
-            p.nombre as nombre_permiso,
-            p.descripcion as descripcion_permiso
+            r.nombre AS nombre_rol,
+            p.nombre AS nombre_permiso,
+            p.descripcion
           FROM Rol_Permiso rp
           INNER JOIN Roles r ON rp.id_rol = r.id_rol
           INNER JOIN Permisos p ON rp.id_permiso = p.id_permiso
@@ -26,24 +25,21 @@ exports.rolPermisoRepository = {
             throw new Error(`Error al obtener permisos de roles: ${error}`);
         }
     },
-    async getByRolId(id_rol) {
+    async getByRolId(rolId) {
         try {
             const result = await database_1.pool
                 .request()
-                .input('id_rol', id_rol)
+                .input('rolId', rolId)
                 .query(`
           SELECT 
             rp.id_rol,
             rp.id_permiso,
-            r.nombre as nombre_rol,
-            r.descripcion as descripcion_rol,
-            p.nombre as nombre_permiso,
-            p.descripcion as descripcion_permiso
+            p.nombre,
+            p.descripcion
           FROM Rol_Permiso rp
-          INNER JOIN Roles r ON rp.id_rol = r.id_rol
           INNER JOIN Permisos p ON rp.id_permiso = p.id_permiso
-          WHERE rp.id_rol = @id_rol
-          ORDER BY rp.id_permiso
+          WHERE rp.id_rol = @rolId
+          ORDER BY p.nombre
         `);
             return result.recordset;
         }
@@ -51,97 +47,105 @@ exports.rolPermisoRepository = {
             throw new Error(`Error al obtener permisos del rol: ${error}`);
         }
     },
-    async getByPermisoId(id_permiso) {
+    async getById(id_rol, id_permiso) {
         try {
             const result = await database_1.pool
                 .request()
+                .input('id_rol', id_rol)
                 .input('id_permiso', id_permiso)
                 .query(`
           SELECT 
             rp.id_rol,
             rp.id_permiso,
-            r.nombre as nombre_rol,
-            r.descripcion as descripcion_rol,
-            p.nombre as nombre_permiso,
-            p.descripcion as descripcion_permiso
+            p.nombre,
+            p.descripcion
           FROM Rol_Permiso rp
-          INNER JOIN Roles r ON rp.id_rol = r.id_rol
           INNER JOIN Permisos p ON rp.id_permiso = p.id_permiso
-          WHERE rp.id_permiso = @id_permiso
-          ORDER BY rp.id_rol
+          WHERE rp.id_rol = @id_rol AND rp.id_permiso = @id_permiso
         `);
-            return result.recordset;
+            return result.recordset[0];
         }
         catch (error) {
-            throw new Error(`Error al obtener roles con permiso: ${error}`);
+            throw new Error(`Error al obtener permiso: ${error}`);
         }
     },
     async create(data) {
         try {
-            // Verificar si ya existe la asociación
+            console.log('Repository create called with:', data);
+            // Verificar que el rol existe
+            const rolExists = await database_1.pool
+                .request()
+                .input('id_rol', data.id_rol)
+                .query('SELECT 1 FROM Roles WHERE id_rol = @id_rol');
+            if (rolExists.recordset.length === 0) {
+                throw new Error(`El rol con id ${data.id_rol} no existe`);
+            }
+            // Verificar que el permiso existe
+            const permisoExists = await database_1.pool
+                .request()
+                .input('id_permiso', data.id_permiso)
+                .query('SELECT 1 FROM Permisos WHERE id_permiso = @id_permiso');
+            if (permisoExists.recordset.length === 0) {
+                throw new Error(`El permiso con id ${data.id_permiso} no existe`);
+            }
+            // Verificar que NO esté ya asignado
             const exists = await database_1.pool
                 .request()
                 .input('id_rol', data.id_rol)
                 .input('id_permiso', data.id_permiso)
                 .query(`
-          SELECT * FROM Rol_Permiso 
+          SELECT 1 FROM Rol_Permiso 
           WHERE id_rol = @id_rol AND id_permiso = @id_permiso
         `);
             if (exists.recordset.length > 0) {
-                throw new Error('Esta asociación rol-permiso ya existe');
+                throw new Error('Este permiso ya está asignado al rol');
             }
-            await database_1.pool
+            const result = await database_1.pool
                 .request()
                 .input('id_rol', data.id_rol)
                 .input('id_permiso', data.id_permiso)
                 .query(`
           INSERT INTO Rol_Permiso (id_rol, id_permiso)
-          VALUES (@id_rol, @id_permiso)
+          VALUES (@id_rol, @id_permiso);
+          
+          SELECT 
+            rp.id_rol,
+            rp.id_permiso,
+            p.nombre,
+            p.descripcion
+          FROM Rol_Permiso rp
+          INNER JOIN Permisos p ON rp.id_permiso = p.id_permiso
+          WHERE rp.id_rol = @id_rol AND rp.id_permiso = @id_permiso
         `);
-            return data;
+            console.log('Insert result:', result.recordset[0]);
+            return result.recordset[0];
         }
         catch (error) {
-            throw new Error(`Error al crear asociación rol-permiso: ${error}`);
+            console.error('Repository create error:', error.message);
+            throw new Error(`Error al crear permiso de rol: ${error.message}`);
         }
     },
     async delete(id_rol, id_permiso) {
         try {
-            await database_1.pool
+            console.log('Repository delete called with:', { id_rol, id_permiso });
+            const result = await database_1.pool
                 .request()
                 .input('id_rol', id_rol)
                 .input('id_permiso', id_permiso)
-                .query(`
-          DELETE FROM Rol_Permiso 
-          WHERE id_rol = @id_rol AND id_permiso = @id_permiso
-        `);
+                .query('DELETE FROM Rol_Permiso WHERE id_rol = @id_rol AND id_permiso = @id_permiso');
+            if (result.rowsAffected[0] === 0) {
+                throw new Error('No existe esa asignación de permiso al rol');
+            }
             return true;
         }
         catch (error) {
-            throw new Error(`Error al eliminar asociación rol-permiso: ${error}`);
+            console.error('Repository delete error:', error.message);
+            throw new Error(`Error al eliminar permiso de rol: ${error.message}`);
         }
     },
     async deleteByRolId(id_rol) {
-        try {
-            await database_1.pool
-                .request()
-                .input('id_rol', id_rol)
-                .query('DELETE FROM Rol_Permiso WHERE id_rol = @id_rol');
-            return true;
-        }
-        catch (error) {
-            throw new Error(`Error al eliminar permisos del rol: ${error}`);
-        }
-    },
-    async deleteByPermisoId(id_permiso) {
-        try {
-            await database_1.pool
-                .request()
-                .input('id_permiso', id_permiso)
-                .query('DELETE FROM Rol_Permiso WHERE id_permiso = @id_permiso');
-            return true;
-        }
-        catch (error) {
-            throw new Error(`Error al eliminar asociaciones del permiso: ${error}`);
-        }
+        const query = 'DELETE FROM Rol_Permiso WHERE id_rol = @id_rol';
+        const result = await database_1.pool.request().input('id_rol', id_rol).query(query);
+        return result;
     },
 };

@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteCompra = exports.updateCompra = exports.getCompraById = exports.getAllCompras = exports.crearCompra = void 0;
+exports.deleteCompra = exports.updateCompra = exports.getCompraById = exports.getComprasByEstado = exports.getAllCompras = exports.crearCompra = void 0;
 const database_1 = require("../../config/database");
 const crearCompra = async (data) => {
     const { id_proveedor, total } = data;
@@ -16,7 +16,9 @@ const crearCompra = async (data) => {
 exports.crearCompra = crearCompra;
 const getAllCompras = async () => {
     const result = await database_1.pool.request().query(`
-    SELECT c.id_compra, c.id_proveedor, p.nombre as proveedor_nombre, c.total, c.fecha_compra
+    SELECT c.id_compra, c.id_proveedor, p.nombre as proveedor_nombre, p.nit as proveedor_nit, c.total,
+      CONVERT(varchar(23), c.fecha_compra, 121) as fecha_compra,
+      c.estado_pago
     FROM Compras c
     JOIN Proveedores p ON c.id_proveedor = p.id_proveedor
     ORDER BY c.fecha_compra DESC
@@ -24,18 +26,33 @@ const getAllCompras = async () => {
     return result.recordset;
 };
 exports.getAllCompras = getAllCompras;
+const getComprasByEstado = async (estado_pago) => {
+    const result = await database_1.pool.request()
+        .input("estado_pago", estado_pago)
+        .query(`
+      SELECT c.id_compra, c.id_proveedor, p.nombre as proveedor_nombre, p.nit as proveedor_nit, c.total,
+        CONVERT(varchar(23), c.fecha_compra, 121) as fecha_compra,
+        c.estado_pago
+      FROM Compras c
+      JOIN Proveedores p ON c.id_proveedor = p.id_proveedor
+      WHERE c.estado_pago = @estado_pago
+      ORDER BY c.fecha_compra DESC
+    `);
+    return result.recordset;
+};
+exports.getComprasByEstado = getComprasByEstado;
 const getCompraById = async (id_compra) => {
     const compraResult = await database_1.pool.request()
         .input("id_compra", id_compra)
         .query(`
-      SELECT c.id_compra, c.id_proveedor, p.nombre as proveedor_nombre, c.total, c.fecha_compra
+      SELECT c.id_compra, c.id_proveedor, p.nombre as proveedor_nombre, p.nit as proveedor_nit, c.total,
+        CONVERT(varchar(23), c.fecha_compra, 121) as fecha_compra,
+        c.estado_pago
       FROM Compras c
       JOIN Proveedores p ON c.id_proveedor = p.id_proveedor
       WHERE c.id_compra = @id_compra
     `);
-    if (compraResult.recordset.length === 0) {
-        return null;
-    }
+    // ... resto del código
     const detallesResult = await database_1.pool.request()
         .input("id_compra", id_compra)
         .query(`
@@ -51,7 +68,7 @@ const getCompraById = async (id_compra) => {
 };
 exports.getCompraById = getCompraById;
 const updateCompra = async (id_compra, data) => {
-    const { id_proveedor, total } = data;
+    const { id_proveedor, total, estado_pago, fecha_compra } = data;
     let query = "UPDATE Compras SET ";
     const inputs = [];
     const params = [];
@@ -62,6 +79,14 @@ const updateCompra = async (id_compra, data) => {
     if (total !== undefined) {
         params.push("total = @total");
         inputs.push({ name: "total", value: total });
+    }
+    if (estado_pago !== undefined) {
+        params.push("estado_pago = @estado_pago");
+        inputs.push({ name: "estado_pago", value: estado_pago });
+    }
+    if (fecha_compra !== undefined) {
+        params.push("fecha_compra = @fecha_compra");
+        inputs.push({ name: "fecha_compra", value: fecha_compra });
     }
     if (params.length === 0) {
         throw new Error("No fields to update");

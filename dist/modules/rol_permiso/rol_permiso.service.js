@@ -12,57 +12,43 @@ exports.rolPermisoService = {
             throw new utils_1.AppError('Error al obtener permisos de roles', 500);
         }
     },
-    async getByRolId(id_rol) {
+    async getByRolId(rolId) {
         try {
-            const permisos = await rol_permiso_repository_1.rolPermisoRepository.getByRolId(id_rol);
-            return permisos;
+            return await rol_permiso_repository_1.rolPermisoRepository.getByRolId(rolId);
         }
         catch (error) {
             throw new utils_1.AppError('Error al obtener permisos del rol', 500);
         }
     },
-    async getByPermisoId(id_permiso) {
-        try {
-            const roles = await rol_permiso_repository_1.rolPermisoRepository.getByPermisoId(id_permiso);
-            return roles;
-        }
-        catch (error) {
-            throw new utils_1.AppError('Error al obtener roles con permiso', 500);
-        }
-    },
     async create(data) {
         try {
+            console.log('Service create called with:', data);
             return await rol_permiso_repository_1.rolPermisoRepository.create(data);
         }
         catch (error) {
-            throw new utils_1.AppError('Error al crear asociación rol-permiso', 500);
+            console.error('Service create error:', error.message);
+            throw new utils_1.AppError(error.message || 'Error al crear permiso de rol', 500);
         }
     },
     async delete(id_rol, id_permiso) {
         try {
             await rol_permiso_repository_1.rolPermisoRepository.delete(id_rol, id_permiso);
-            return { message: 'Asociación rol-permiso eliminada exitosamente' };
+            return { message: 'Permiso de rol eliminado exitosamente' };
         }
         catch (error) {
-            throw new utils_1.AppError('Error al eliminar asociación rol-permiso', 500);
+            throw new utils_1.AppError(error.message || 'Error al eliminar permiso de rol', 500);
         }
     },
-    async deleteByRolId(id_rol) {
+    async deleteByRolId(rolId) {
         try {
-            await rol_permiso_repository_1.rolPermisoRepository.deleteByRolId(id_rol);
+            console.log('Service deleteByRolId called with:', rolId);
+            const result = await rol_permiso_repository_1.rolPermisoRepository.deleteByRolId(rolId);
+            console.log(`Deleted ${result.rowsAffected[0]} permission records for role ${rolId}`);
             return { message: 'Permisos del rol eliminados exitosamente' };
         }
         catch (error) {
-            throw new utils_1.AppError('Error al eliminar permisos del rol', 500);
-        }
-    },
-    async deleteByPermisoId(id_permiso) {
-        try {
-            await rol_permiso_repository_1.rolPermisoRepository.deleteByPermisoId(id_permiso);
-            return { message: 'Asociaciones del permiso eliminadas exitosamente' };
-        }
-        catch (error) {
-            throw new utils_1.AppError('Error al eliminar asociaciones del permiso', 500);
+            console.error('Service deleteByRolId error:', error.message);
+            throw new utils_1.AppError(error.message || 'Error al eliminar permisos del rol', 500);
         }
     },
 };

@@ -15,7 +15,9 @@ export const crearCompra = async (data: any) => {
 
 export const getAllCompras = async () => {
   const result = await pool.request().query(`
-    SELECT c.id_compra, c.id_proveedor, p.nombre as proveedor_nombre, c.total, c.fecha_compra
+    SELECT c.id_compra, c.id_proveedor, p.nombre as proveedor_nombre, p.nit as proveedor_nit, c.total,
+      CONVERT(varchar(23), c.fecha_compra, 121) as fecha_compra,
+      c.estado_pago
     FROM Compras c
     JOIN Proveedores p ON c.id_proveedor = p.id_proveedor
     ORDER BY c.fecha_compra DESC
@@ -23,20 +25,33 @@ export const getAllCompras = async () => {
   return result.recordset;
 };
 
+export const getComprasByEstado = async (estado_pago: string) => {
+  const result = await pool.request()
+    .input("estado_pago", estado_pago)
+    .query(`
+      SELECT c.id_compra, c.id_proveedor, p.nombre as proveedor_nombre, p.nit as proveedor_nit, c.total,
+        CONVERT(varchar(23), c.fecha_compra, 121) as fecha_compra,
+        c.estado_pago
+      FROM Compras c
+      JOIN Proveedores p ON c.id_proveedor = p.id_proveedor
+      WHERE c.estado_pago = @estado_pago
+      ORDER BY c.fecha_compra DESC
+    `);
+  return result.recordset;
+};
+
 export const getCompraById = async (id_compra: number) => {
   const compraResult = await pool.request()
     .input("id_compra", id_compra)
     .query(`
-      SELECT c.id_compra, c.id_proveedor, p.nombre as proveedor_nombre, c.total, c.fecha_compra
+      SELECT c.id_compra, c.id_proveedor, p.nombre as proveedor_nombre, p.nit as proveedor_nit, c.total,
+        CONVERT(varchar(23), c.fecha_compra, 121) as fecha_compra,
+        c.estado_pago
       FROM Compras c
       JOIN Proveedores p ON c.id_proveedor = p.id_proveedor
       WHERE c.id_compra = @id_compra
     `);
-
-  if (compraResult.recordset.length === 0) {
-    return null;
-  }
-
+  // ... resto del código
   const detallesResult = await pool.request()
     .input("id_compra", id_compra)
     .query(`
@@ -53,7 +68,7 @@ export const getCompraById = async (id_compra: number) => {
 };
 
 export const updateCompra = async (id_compra: number, data: any) => {
-  const { id_proveedor, total } = data;
+  const { id_proveedor, total, estado_pago, fecha_compra } = data;
 
   let query = "UPDATE Compras SET ";
   const inputs: any[] = [];
@@ -66,6 +81,14 @@ export const updateCompra = async (id_compra: number, data: any) => {
   if (total !== undefined) {
     params.push("total = @total");
     inputs.push({ name: "total", value: total });
+  }
+  if (estado_pago !== undefined) {
+    params.push("estado_pago = @estado_pago");
+    inputs.push({ name: "estado_pago", value: estado_pago });
+  }
+  if (fecha_compra !== undefined) {
+    params.push("fecha_compra = @fecha_compra");
+    inputs.push({ name: "fecha_compra", value: fecha_compra });
   }
 
   if (params.length === 0) {

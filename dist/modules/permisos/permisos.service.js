@@ -33,8 +33,9 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deletePermiso = exports.updatePermiso = exports.createPermiso = exports.getPermisoById = exports.getAllPermisos = void 0;
+exports.deletePermiso = exports.updatePermiso = exports.seedDefaultPermisos = exports.getPermisosTree = exports.createPermiso = exports.getPermisoById = exports.getAllPermisos = void 0;
 const repository = __importStar(require("./permisos.repository"));
+const permisos_constants_1 = require("./permisos.constants");
 const getAllPermisos = async () => await repository.getAllPermisos();
 exports.getAllPermisos = getAllPermisos;
 const getPermisoById = async (id) => await repository.getPermisoById(id);
@@ -44,6 +45,49 @@ const createPermiso = async (data) => {
     return { message: "Permiso creado correctamente" };
 };
 exports.createPermiso = createPermiso;
+const getPermisosTree = async () => {
+    const permisos = await repository.getAllPermisos();
+    const tree = {};
+    // Aceptar tanto 'Gestión' como 'Gestion' (con/sin acento) y 'Dashboard'
+    const regex = /^(Gesti[oó]n de [^-]+|Dashboard) - (Ver|Crear|Editar|Eliminar|Cambiar Estado)$/i;
+    permisos.forEach((permiso) => {
+        const match = permiso.nombre.match(regex);
+        if (!match) {
+            const moduleKey = "Otros";
+            if (!tree[moduleKey]) {
+                tree[moduleKey] = { module: moduleKey, permisos: [] };
+            }
+            tree[moduleKey].permisos.push({
+                id_permiso: permiso.id_permiso,
+                nombre: permiso.nombre,
+                descripcion: permiso.descripcion
+            });
+            return;
+        }
+        const moduleLabel = match[1];
+        const action = match[2];
+        if (!tree[moduleLabel]) {
+            tree[moduleLabel] = { module: moduleLabel, permisos: [] };
+        }
+        tree[moduleLabel].permisos.push({
+            id_permiso: permiso.id_permiso,
+            action,
+            nombre: permiso.nombre,
+            descripcion: permiso.descripcion
+        });
+    });
+    return Object.values(tree);
+};
+exports.getPermisosTree = getPermisosTree;
+const seedDefaultPermisos = async () => {
+    const inserted = [];
+    for (const permiso of permisos_constants_1.defaultPermissionDefinitions) {
+        const row = await repository.createPermisoIfNotExists(permiso);
+        inserted.push(row);
+    }
+    return inserted;
+};
+exports.seedDefaultPermisos = seedDefaultPermisos;
 const updatePermiso = async (id, data) => {
     await repository.updatePermiso(id, data);
     return { message: "Permiso actualizado correctamente" };

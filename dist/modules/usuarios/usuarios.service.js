@@ -33,13 +33,25 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.crearUsuario = exports.getUsuarios = void 0;
+exports.deleteUsuario = exports.updateUsuario = exports.crearUsuario = exports.getUsuarioById = exports.getUsuarios = void 0;
 const repository = __importStar(require("./usuarios.repository"));
 const getUsuarios = async () => {
     return await repository.getUsuarios();
 };
 exports.getUsuarios = getUsuarios;
+const getUsuarioById = async (id) => {
+    return await repository.getUsuarioById(id);
+};
+exports.getUsuarioById = getUsuarioById;
 const crearUsuario = async (data) => {
     return await repository.crearUsuario(data);
 };
 exports.crearUsuario = crearUsuario;
+const updateUsuario = async (id, data) => {
+    return await repository.updateUsuario(id, data);
+};
+exports.updateUsuario = updateUsuario;
+const deleteUsuario = async (id) => {
+    return await repository.deleteUsuario(id);
+};
+exports.deleteUsuario = deleteUsuario;

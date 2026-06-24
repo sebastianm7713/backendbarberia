@@ -1,14 +1,14 @@
 import { Router } from "express";
-import { crear } from "./ventas.controller";
-import { listar } from "./ventas.controller";
-import { obtenerPorId } from "./ventas.controller";
+import { crear, obtenerTodos, obtenerPorId, actualizar, eliminar } from "./ventas.controller";
 import { verifyToken } from "../../middleware/auth.middleware";
-import { authorizeRoles } from "../../middleware/role.middleware";
+import { authorizeByModule } from "../../middleware/permission.middleware";
 
 const router = Router();
 
 // Admin y Barbero pueden vender
-router.post("/", verifyToken, authorizeRoles(1, 2), crear);
-router.get("/", verifyToken, authorizeRoles(1, 2), listar);
-router.get("/:id", verifyToken, authorizeRoles(1, 2), obtenerPorId);
+router.post("/", verifyToken, authorizeByModule('Ventas'), crear);
+router.get("/", verifyToken, authorizeByModule('Ventas'), obtenerTodos);
+router.get("/:id", verifyToken, authorizeByModule('Ventas'), obtenerPorId);
+router.put("/:id", verifyToken, authorizeByModule('Ventas'), actualizar);
+router.delete("/:id", verifyToken, authorizeByModule('Ventas'), eliminar);
 export default router;

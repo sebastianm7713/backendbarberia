@@ -1,11 +1,11 @@
 import { z } from 'zod';
 
 export const detalleVentaProductoSchema = z.object({
-  id_venta: z.number().int().positive('ID venta requerido'),
-  id_producto: z.number().int().positive('ID producto requerido'),
-  cantidad: z.number().int().positive('Cantidad debe ser mayor a 0'),
-  precio_unitario: z.number().positive('Precio unitario debe ser mayor a 0'),
-  subtotal: z.number().positive('Subtotal debe ser mayor a 0'),
+  id_venta: z.coerce.number().int().positive('id_venta debe ser un número entero positivo'),
+  id_producto: z.coerce.number().int().positive('id_producto debe ser un número entero positivo'),
+  cantidad: z.coerce.number().int().positive('cantidad debe ser un número entero positivo'),
+  precio_unitario: z.coerce.number().positive('precio_unitario debe ser un número positivo'),
+  subtotal: z.coerce.number().positive('subtotal debe ser un número positivo'),
 });
 
 export const createDetalleVentaProductoSchema = detalleVentaProductoSchema.omit({ subtotal: true });

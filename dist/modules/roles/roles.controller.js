@@ -33,17 +33,19 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.eliminar = exports.actualizar = exports.crear = exports.obtenerPorId = exports.obtenerTodos = void 0;
+exports.eliminar = exports.actualizarEstado = exports.actualizar = exports.crear = exports.obtenerPorId = exports.obtenerTodos = void 0;
 const service = __importStar(require("./roles.service"));
 const zod_1 = require("zod");
 const roles_schema_1 = require("./roles.schema");
 const obtenerTodos = async (req, res) => {
     try {
         const roles = await service.getAllRoles();
-        res.json(roles);
+        console.log('obtenerTodos roles result:', roles);
+        res.json({ success: true, data: roles });
     }
     catch (error) {
-        res.status(500).json({ message: error.message });
+        console.error('Error in obtenerTodos:', error);
+        res.status(500).json({ success: false, message: error.message });
     }
 };
 exports.obtenerTodos = obtenerTodos;
@@ -52,33 +54,49 @@ const obtenerPorId = async (req, res) => {
         const rawId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
         const { id } = roles_schema_1.rolIdSchema.parse({ id: parseInt(rawId) });
         const rol = await service.getRolById(id);
+        console.log('obtenerPorId rol result:', rol);
         if (!rol) {
-            return res.status(404).json({ message: "Rol no encontrado" });
+            return res.status(404).json({ success: false, message: "Rol no encontrado" });
         }
-        res.json(rol);
+        res.json({ success: true, data: rol });
     }
     catch (error) {
+        console.error('Error in obtenerPorId:', error);
         if (error instanceof zod_1.z.ZodError) {
-            res.status(400).json({ message: "ID inválido", errors: error.errors });
+            res.status(400).json({ success: false, message: "ID inválido", errors: error.issues });
         }
         else {
-            res.status(500).json({ message: error.message });
+            res.status(500).json({ success: false, message: error.message });
         }
     }
 };
 exports.obtenerPorId = obtenerPorId;
 const crear = async (req, res) => {
     try {
+        console.log('crear req.body:', req.body);
         const validatedData = roles_schema_1.createRolSchema.parse(req.body);
+        console.log('Validated data:', validatedData);
         const result = await service.createRol(validatedData);
-        res.status(201).json(result);
+        console.log('Service result:', result);
+        res.status(201).json({
+            success: true,
+            data: result
+        });
     }
     catch (error) {
+        console.error('Error in crear:', error);
         if (error instanceof zod_1.z.ZodError) {
-            res.status(400).json({ message: "Datos inválidos", errors: error.errors });
+            res.status(400).json({
+                success: false,
+                message: "Datos inválidos",
+                errors: error.issues
+            });
         }
         else {
-            res.status(500).json({ message: error.message });
+            res.status(500).json({
+                success: false,
+                message: error.message || 'Error al crear el rol'
+            });
         }
     }
 };
@@ -87,33 +105,66 @@ const actualizar = async (req, res) => {
     try {
         const rawId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
         const { id } = roles_schema_1.rolIdSchema.parse({ id: parseInt(rawId) });
+        console.log('🔵 actualizar rol ID:', id);
+        console.log('📋 actualizar req.body:', JSON.stringify(req.body, null, 2));
         const validatedData = roles_schema_1.updateRolSchema.parse(req.body);
+        console.log('✅ Validated data:', JSON.stringify(validatedData, null, 2));
         const result = await service.updateRol(id, validatedData);
-        res.json(result);
+        console.log('✅ actualizar result permisos guardados:', result.permisos?.length || 0, 'permisos:', result.permisos?.map((p) => p.nombre));
+        res.json({ success: true, data: result });
     }
     catch (error) {
+        console.error('❌ Error in actualizar:', error);
         if (error instanceof zod_1.z.ZodError) {
-            res.status(400).json({ message: "Datos inválidos", errors: error.errors });
+            res.status(400).json({ success: false, message: "Datos inválidos", errors: error.issues });
         }
         else {
-            res.status(500).json({ message: error.message });
+            res.status(500).json({ success: false, message: error.message });
         }
     }
 };
 exports.actualizar = actualizar;
+const actualizarEstado = async (req, res) => {
+    try {
+        const rawId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+        const { id } = roles_schema_1.rolIdSchema.parse({ id: parseInt(rawId) });
+        const { estado } = zod_1.z.object({ estado: zod_1.z.enum(['activo', 'inactivo']) }).parse(req.body);
+        const result = await service.updateRolEstado(id, estado);
+        console.log('actualizarEstado result:', result);
+        res.json({ success: true, data: result });
+    }
+    catch (error) {
+        console.error('Error in actualizarEstado:', error);
+        if (error instanceof zod_1.z.ZodError) {
+            res.status(400).json({ success: false, message: "Datos inválidos", errors: error.issues });
+        }
+        else {
+            res.status(500).json({ success: false, message: error.message });
+        }
+    }
+};
+exports.actualizarEstado = actualizarEstado;
 const eliminar = async (req, res) => {
     try {
         const rawId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
         const { id } = roles_schema_1.rolIdSchema.parse({ id: parseInt(rawId) });
         const result = await service.deleteRol(id);
-        res.json(result);
+        console.log('eliminar result:', result);
+        res.json({ success: true, data: result });
     }
     catch (error) {
+        console.error('Error in eliminar:', error);
         if (error instanceof zod_1.z.ZodError) {
-            res.status(400).json({ message: "ID inválido", errors: error.errors });
+            res.status(400).json({ success: false, message: "ID inválido", errors: error.issues });
+        }
+        else if (error.message?.includes('no existe')) {
+            res.status(404).json({ success: false, message: error.message });
+        }
+        else if (error.message?.includes('usuarios asignado') || error.message?.includes('No se puede eliminar')) {
+            res.status(400).json({ success: false, message: error.message });
         }
         else {
-            res.status(500).json({ message: error.message });
+            res.status(500).json({ success: false, message: error.message });
         }
     }
 };

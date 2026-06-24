@@ -6,27 +6,39 @@
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
     "build": "tsc",
-    "start": "node dist/server.js"
+    "start": "node dist/server.js",
+    "test-email": "ts-node scripts/test-email.ts",
+    "test": "jest",
+    "coverage": "jest --coverage"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "bcrypt": "^6.0.0",
+    "cookie-parser": "^1.4.7",
     "cors": "^2.8.6",
     "dotenv": "^17.3.1",
     "express": "^5.2.1",
     "jsonwebtoken": "^9.0.3",
     "mssql": "^12.2.0",
+    "nodemailer": "^8.0.5",
     "zod": "^4.3.6"
   },
   "devDependencies": {
     "@types/bcrypt": "^6.0.0",
+    "@types/cookie-parser": "^1.4.10",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
+    "@types/jest": "^30.0.0",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/mssql": "^9.1.9",
     "@types/node": "^25.3.3",
+    "@types/nodemailer": "^8.0.0",
+    "@types/supertest": "^7.2.0",
+    "jest": "^30.4.2",
+    "supertest": "^7.2.2",
+    "ts-jest": "^29.4.11",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.9.3"
   }

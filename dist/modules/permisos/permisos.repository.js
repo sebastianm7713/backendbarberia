@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deletePermiso = exports.updatePermiso = exports.createPermiso = exports.getPermisoById = exports.getAllPermisos = void 0;
+exports.deletePermiso = exports.updatePermiso = exports.createPermisoIfNotExists = exports.findPermisoByNombre = exports.createPermiso = exports.getPermisoById = exports.getAllPermisos = void 0;
 const database_1 = require("../../config/database");
 const getAllPermisos = async () => {
     const result = await database_1.pool.request().query("SELECT * FROM Permisos ORDER BY id_permiso");
@@ -23,6 +23,27 @@ const createPermiso = async (data) => {
         .query("INSERT INTO Permisos (id_permiso, nombre, descripcion) VALUES (@id, @nombre, @descripcion)");
 };
 exports.createPermiso = createPermiso;
+const findPermisoByNombre = async (nombre) => {
+    const result = await database_1.pool.request()
+        .input("nombre", nombre)
+        .query("SELECT * FROM Permisos WHERE nombre = @nombre");
+    return result.recordset[0];
+};
+exports.findPermisoByNombre = findPermisoByNombre;
+const createPermisoIfNotExists = async (data) => {
+    const existing = await (0, exports.findPermisoByNombre)(data.nombre);
+    if (existing)
+        return existing;
+    const idResult = await database_1.pool.request().query("SELECT ISNULL(MAX(id_permiso), 0) + 1 AS nextId FROM Permisos");
+    const id = idResult.recordset[0].nextId;
+    await database_1.pool.request()
+        .input("id", id)
+        .input("nombre", data.nombre)
+        .input("descripcion", data.descripcion)
+        .query("INSERT INTO Permisos (id_permiso, nombre, descripcion) VALUES (@id, @nombre, @descripcion)");
+    return { id_permiso: id, nombre: data.nombre, descripcion: data.descripcion };
+};
+exports.createPermisoIfNotExists = createPermisoIfNotExists;
 const updatePermiso = async (id, data) => {
     const { nombre, descripcion } = data;
     const updates = [];

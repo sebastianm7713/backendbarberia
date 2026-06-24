@@ -33,42 +33,83 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.eliminar = exports.actualizar = exports.crear = exports.obtenerPorId = exports.obtenerTodos = void 0;
+exports.eliminar = exports.actualizar = exports.crear = exports.obtenerPorId = exports.seedPermisosDefault = exports.obtenerPermisosEstructurados = exports.obtenerTodos = void 0;
 const service = __importStar(require("./permisos.service"));
 const zod_1 = require("zod");
 const permisos_schema_1 = require("./permisos.schema");
 const obtenerTodos = async (req, res) => {
     try {
         const permisos = await service.getAllPermisos();
-        res.json(permisos);
+        console.log('obtenerTodos result:', permisos);
+        res.json({ success: true, data: permisos });
     }
     catch (error) {
-        res.status(500).json({ message: error.message });
+        console.error('Error in obtenerTodos:', error);
+        res.status(500).json({ success: false, message: error.message });
     }
 };
 exports.obtenerTodos = obtenerTodos;
+const obtenerPermisosEstructurados = async (req, res) => {
+    try {
+        const permisos = await service.getPermisosTree();
+        console.log('obtenerPermisosEstructurados result:', permisos);
+        res.json({ success: true, data: permisos });
+    }
+    catch (error) {
+        console.error('Error in obtenerPermisosEstructurados:', error);
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+exports.obtenerPermisosEstructurados = obtenerPermisosEstructurados;
+const seedPermisosDefault = async (req, res) => {
+    try {
+        const inserted = await service.seedDefaultPermisos();
+        console.log('seedPermisosDefault result:', inserted);
+        res.status(201).json({ success: true, data: inserted });
+    }
+    catch (error) {
+        console.error('Error in seedPermisosDefault:', error);
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+exports.seedPermisosDefault = seedPermisosDefault;
 const obtenerPorId = async (req, res) => {
     try {
         const rawId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
         const { id } = permisos_schema_1.permisoIdSchema.parse({ id: parseInt(rawId) });
         const permiso = await service.getPermisoById(id);
         if (!permiso)
-            return res.status(404).json({ message: "Permiso no encontrado" });
-        res.json(permiso);
+            return res.status(404).json({ success: false, message: "Permiso no encontrado" });
+        console.log('obtenerPorId result:', permiso);
+        res.json({ success: true, data: permiso });
     }
     catch (error) {
-        res.status(error instanceof zod_1.z.ZodError ? 400 : 500).json({ message: error.message });
+        console.error('Error in obtenerPorId:', error);
+        if (error instanceof zod_1.z.ZodError) {
+            res.status(400).json({ success: false, message: "ID inválido", errors: error.issues });
+        }
+        else {
+            res.status(500).json({ success: false, message: error.message });
+        }
     }
 };
 exports.obtenerPorId = obtenerPorId;
 const crear = async (req, res) => {
     try {
+        console.log('crear req.body:', req.body);
         const validatedData = permisos_schema_1.createPermisoSchema.parse(req.body);
         const result = await service.createPermiso(validatedData);
-        res.status(201).json(result);
+        console.log('crear result:', result);
+        res.status(201).json({ success: true, data: result });
     }
     catch (error) {
-        res.status(error instanceof zod_1.z.ZodError ? 400 : 500).json({ message: error.message });
+        console.error('Error in crear:', error);
+        if (error instanceof zod_1.z.ZodError) {
+            res.status(400).json({ success: false, message: "Datos inválidos", errors: error.issues });
+        }
+        else {
+            res.status(500).json({ success: false, message: error.message });
+        }
     }
 };
 exports.crear = crear;
@@ -76,12 +117,20 @@ const actualizar = async (req, res) => {
     try {
         const rawId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
         const { id } = permisos_schema_1.permisoIdSchema.parse({ id: parseInt(rawId) });
+        console.log('actualizar req.body:', req.body);
         const validatedData = permisos_schema_1.updatePermisoSchema.parse(req.body);
         const result = await service.updatePermiso(id, validatedData);
-        res.json(result);
+        console.log('actualizar result:', result);
+        res.json({ success: true, data: result });
     }
     catch (error) {
-        res.status(error instanceof zod_1.z.ZodError ? 400 : 500).json({ message: error.message });
+        console.error('Error in actualizar:', error);
+        if (error instanceof zod_1.z.ZodError) {
+            res.status(400).json({ success: false, message: "Datos inválidos", errors: error.issues });
+        }
+        else {
+            res.status(500).json({ success: false, message: error.message });
+        }
     }
 };
 exports.actualizar = actualizar;
@@ -90,10 +139,17 @@ const eliminar = async (req, res) => {
         const rawId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
         const { id } = permisos_schema_1.permisoIdSchema.parse({ id: parseInt(rawId) });
         const result = await service.deletePermiso(id);
-        res.json(result);
+        console.log('eliminar result:', result);
+        res.json({ success: true, data: result });
     }
     catch (error) {
-        res.status(error instanceof zod_1.z.ZodError ? 400 : 500).json({ message: error.message });
+        console.error('Error in eliminar:', error);
+        if (error instanceof zod_1.z.ZodError) {
+            res.status(400).json({ success: false, message: "ID inválido", errors: error.issues });
+        }
+        else {
+            res.status(500).json({ success: false, message: error.message });
+        }
     }
 };
 exports.eliminar = eliminar;
