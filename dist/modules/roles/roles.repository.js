@@ -21,6 +21,11 @@ const getRolById = async (id) => {
 exports.getRolById = getRolById;
 const createRol = async (data) => {
     const { nombre, descripcion, estado = 'activo', permisos } = data;
+    const permisoIds = Array.isArray(permisos)
+        ? Array.from(new Set(permisos
+            .map((id) => Number(id))
+            .filter((id) => Number.isInteger(id) && id > 0)))
+        : [];
     try {
         // Como id_rol NO es auto-increment, obtener el próximo ID
         const maxIdResult = await database_1.pool.request().query(`
@@ -41,8 +46,8 @@ const createRol = async (data) => {
       `);
         console.log('Rol created successfully:', nextId);
         // Si vienen permisos, insertarlos en Rol_Permiso
-        if (Array.isArray(permisos) && permisos.length > 0) {
-            for (const id_permiso of permisos) {
+        if (permisoIds.length > 0) {
+            for (const id_permiso of permisoIds) {
                 // Verificar existencia del permiso
                 const permisoExists = await database_1.pool
                     .request()
@@ -124,11 +129,16 @@ const updateRol = async (id, data) => {
             await request.query(query);
         }
         if (permisos !== undefined) {
+            const permisoIdsToSave = Array.isArray(permisos)
+                ? Array.from(new Set(permisos
+                    .map((id) => Number(id))
+                    .filter((id) => Number.isInteger(id) && id > 0)))
+                : [];
             await database_1.pool.request()
                 .input('id_rol', id)
                 .query('DELETE FROM Rol_Permiso WHERE id_rol = @id_rol');
-            if (Array.isArray(permisos) && permisos.length > 0) {
-                for (const id_permiso of permisos) {
+            if (permisoIdsToSave.length > 0) {
+                for (const id_permiso of permisoIdsToSave) {
                     const permisoExists = await database_1.pool
                         .request()
                         .input('id_permiso', id_permiso)

@@ -1,0 +1,136 @@
+﻿server.ts:22 import permisosRoutes from "./modules/permisos/permisos.routes";
+server.ts:52 app.use("/api/permisos", permisosRoutes);
+auth.middleware.ts:4 import { getPermisosByRol } from "../modules/auth/auth.repository";
+auth.middleware.ts:41 const permisosFromPayload = Array.isArray(decoded.permisos)
+auth.middleware.ts:42 ? decoded.permisos
+auth.middleware.ts:43 : typeof decoded.permisos === 'string'
+auth.middleware.ts:44 ? [decoded.permisos]
+auth.middleware.ts:51 const latestPermisos = roleId ? await getPermisosByRol(Number(roleId)) : permisosFromPayload;
+auth.middleware.ts:61 permisos: latestPermisos,
+permission.middleware.ts:43 // espera que verifyToken ya haya colocado user con permisos en req
+permission.middleware.ts:65 const permisos: string[] = Array.isArray(user.permisos) ? user.permisos : [];
+permission.middleware.ts:67 permisos.some((permiso) => permissionMatchesKeyword(permiso, required))
+permission.middleware.ts:71 console.warn('authorizePermission - Missing permiso:', needed, 'user.permisos:', permisos);
+permission.middleware.ts:103 const permisos: string[] = Array.isArray(user.permisos) ? user.permisos : [];
+permission.middleware.ts:104 const matched = permisos.some((permiso) =>
+permission.middleware.ts:109 console.warn('authorizeAnyPermission - No matching permiso for keywords:', keywords, 'user.permisos:', permisos);
+auth.controller.ts:117 // devuelve los permisos decodificados del token
+auth.controller.ts:118 export const getPermisos = (req: Request, res: Response) => {
+auth.controller.ts:121 const permisos = user?.permisos || [];
+auth.controller.ts:122 console.log('getPermisos result:', permisos);
+auth.controller.ts:123 res.json({ success: true, data: { permisos } });
+auth.controller.ts:125 console.error('Error in getPermisos:', error);
+auth.repository.ts:90 // devuelve array de nombres de permisos asociados a un rol
+auth.repository.ts:91 export const getPermisosByRol = async (rolId: number) => {
+auth.repository.ts:97 JOIN Permisos p ON rp.id_permiso = p.id_permiso
+auth.routes.ts:12 router.get("/permisos", verifyToken, controller.getPermisos);
+auth.service.ts:26 const permisos: string[] = await repo.getPermisosByRol(user.rol_id);
+auth.service.ts:29 console.log('📋 Permisos cargados de BD:', permisos);
+auth.service.ts:36 permisos,
+auth.service.ts:48 permisos,
+categorias_productos.routes.ts:8 // acceso restringido: solo usuarios autenticados con permisos de admin pueden gestionar categorías de productos
+permisos.constants.ts:30 "Permisos",
+permisos.controller.ts:2 import * as service from "./permisos.service";
+permisos.controller.ts:4 import { createPermisoSchema, updatePermisoSchema, permisoIdSchema } from "./permisos.schema";
+permisos.controller.ts:8 const permisos = await service.getAllPermisos();
+permisos.controller.ts:9 console.log('obtenerTodos result:', permisos);
+permisos.controller.ts:10 res.json({ success: true, data: permisos });
+permisos.controller.ts:17 export const obtenerPermisosEstructurados = async (req: Request, res: Response) => {
+permisos.controller.ts:19 const permisos = await service.getPermisosTree();
+permisos.controller.ts:20 console.log('obtenerPermisosEstructurados result:', permisos);
+permisos.controller.ts:21 res.json({ success: true, data: permisos });
+permisos.controller.ts:23 console.error('Error in obtenerPermisosEstructurados:', error);
+permisos.controller.ts:28 export const seedPermisosDefault = async (req: Request, res: Response) => {
+permisos.controller.ts:30 const inserted = await service.seedDefaultPermisos();
+permisos.controller.ts:31 console.log('seedPermisosDefault result:', inserted);
+permisos.controller.ts:34 console.error('Error in seedPermisosDefault:', error);
+permisos.controller.ts:60 const validatedData = createPermisoSchema.parse(req.body);
+permisos.controller.ts:79 const validatedData = updatePermisoSchema.parse(req.body);
+permisos.repository.ts:12 export const getAllPermisos = async () => {
+permisos.repository.ts:13 const result = await pool.request().query("SELECT * FROM Permisos ORDER BY id_permiso");
+permisos.repository.ts:18 const result = await pool.request().input("id", id).query("SELECT * FROM Permisos WHERE id_permiso = @id");
+permisos.repository.ts:24 const idResult = await pool.request().query("SELECT ISNULL(MAX(id_permiso), 0) + 1 AS nextId FROM Permisos");
+permisos.repository.ts:31 .query("INSERT INTO Permisos (id_permiso, nombre, descripcion) VALUES (@id, @nombre, @descripcion)");
+permisos.repository.ts:37 const result = await pool.request().query("SELECT * FROM Permisos");
+permisos.repository.ts:51 const idResult = await pool.request().query("SELECT ISNULL(MAX(id_permiso), 0) + 1 AS nextId FROM Permisos");
+permisos.repository.ts:58 .query("INSERT INTO Permisos (id_permiso, nombre, descripcion) VALUES (@id, @nombre, @descripcion)");
+permisos.repository.ts:78 await request.query(`UPDATE Permisos SET ${updates.join(", ")} WHERE id_permiso = @id`);
+permisos.repository.ts:85 .query("DELETE FROM Permisos WHERE id_permiso = @id");
+permisos.routes.ts:2 import { obtenerTodos, obtenerPermisosEstructurados, seedPermisosDefault, obtenerPorId, crear, actualizar, eliminar } from "./permisos.controller";
+permisos.routes.ts:8 router.get("/", verifyToken, authorizeByModule('Permisos'), obtenerTodos);
+permisos.routes.ts:9 router.get("/tree", verifyToken, authorizeByModule('Permisos'), obtenerPermisosEstructurados);
+permisos.routes.ts:10 router.post("/seed-defaults", verifyToken, authorizeByModule('Permisos'), seedPermisosDefault);
+permisos.routes.ts:11 router.get("/:id", verifyToken, authorizeByModule('Permisos'), obtenerPorId);
+permisos.routes.ts:12 router.post("/", verifyToken, authorizeByModule('Permisos'), crear);
+permisos.routes.ts:13 router.put("/:id", verifyToken, authorizeByModule('Permisos'), actualizar);
+permisos.routes.ts:14 router.delete("/:id", verifyToken, authorizeByModule('Permisos'), eliminar);
+permisos.schema.ts:3 export const createPermisoSchema = z.object({
+permisos.schema.ts:8 export const updatePermisoSchema = z.object({
+permisos.service.ts:1 import * as repository from "./permisos.repository";
+permisos.service.ts:2 import { defaultPermissionDefinitions } from "./permisos.constants";
+permisos.service.ts:4 export const getAllPermisos = async () => await repository.getAllPermisos();
+permisos.service.ts:10 export const getPermisosTree = async () => {
+permisos.service.ts:11 const permisos = await repository.getAllPermisos();
+permisos.service.ts:12 const tree: Record<string, { module: string; permisos: any[] }> = {};
+permisos.service.ts:18 permisos.forEach((permiso: any) => {
+permisos.service.ts:22 if (!tree[moduleKey]) tree[moduleKey] = { module: moduleKey, permisos: [] };
+permisos.service.ts:23 tree[moduleKey].permisos.push({
+permisos.service.ts:34 if (!tree[moduleLabel]) tree[moduleLabel] = { module: moduleLabel, permisos: [] };
+permisos.service.ts:36 tree[moduleLabel].permisos.push({
+permisos.service.ts:47 export const seedDefaultPermisos = async () => {
+roles.controller.ts:78 console.log('✅ actualizar result permisos guardados:', result.permisos?.length || 0, 'permisos:', result.permisos?.map((p: any) => p.nombre));
+roles.repository.ts:21 const { nombre, descripcion, estado = 'activo', permisos } = data;
+roles.repository.ts:23 const permisoIds = Array.isArray(permisos)
+roles.repository.ts:26 permisos
+roles.repository.ts:57 // Si vienen permisos, insertarlos en Rol_Permiso
+roles.repository.ts:64 .query('SELECT 1 FROM Permisos WHERE id_permiso = @id_permiso');
+roles.repository.ts:91 // Recuperar permisos asignados para devolverlos en la respuesta
+roles.repository.ts:92 const permisosAssigned = await pool
+roles.repository.ts:98 INNER JOIN Permisos p ON rp.id_permiso = p.id_permiso
+roles.repository.ts:107 permisos: permisosAssigned.recordset
+roles.repository.ts:119 const { nombre, descripcion, estado, permisos } = data;
+roles.repository.ts:149 if (permisos !== undefined) {
+roles.repository.ts:150 const permisoIdsToSave = Array.isArray(permisos)
+roles.repository.ts:153 permisos
+roles.repository.ts:169 .query('SELECT 1 FROM Permisos WHERE id_permiso = @id_permiso');
+roles.repository.ts:184 const permisosAssigned = await pool
+roles.repository.ts:190 INNER JOIN Permisos p ON rp.id_permiso = p.id_permiso
+roles.repository.ts:199 permisos: permisosAssigned.recordset,
+roles.schema.ts:6 permisos: z.array(z.number().int().positive()).optional(),
+roles.schema.ts:14 permisos: z.array(z.number().int().positive()).optional(),
+rol_permiso.controller.ts:2 import { rolPermisoService } from './rol_permiso.service';
+rol_permiso.controller.ts:3 import { createRolPermisoSchema } from './rol_permiso.schema';
+rol_permiso.controller.ts:8 const asignaciones = await rolPermisoService.getAll();
+rol_permiso.controller.ts:23 const permisos = await rolPermisoService.getByRolId(id_rol);
+rol_permiso.controller.ts:26 message: 'Permisos del rol obtenidos exitosamente',
+rol_permiso.controller.ts:27 data: permisos,
+rol_permiso.controller.ts:38 const validationResult = createRolPermisoSchema.safeParse(req.body);
+rol_permiso.controller.ts:48 const asignacion = await rolPermisoService.create(validationResult.data);
+rol_permiso.controller.ts:86 await rolPermisoService.delete(id_rol, id_permiso);
+rol_permiso.controller.ts:115 await rolPermisoService.deleteByRolId(id_rol);
+rol_permiso.controller.ts:119 message: 'Todos los permisos del rol eliminados exitosamente',
+rol_permiso.controller.ts:126 message: error.message || 'Error al eliminar permisos del rol',
+rol_permiso.repository.ts:18 INNER JOIN Permisos p ON rp.id_permiso = p.id_permiso
+rol_permiso.repository.ts:23 throw new Error(`Error al obtener permisos de roles: ${error}`);
+rol_permiso.repository.ts:39 INNER JOIN Permisos p ON rp.id_permiso = p.id_permiso
+rol_permiso.repository.ts:45 throw new Error(`Error al obtener permisos del rol: ${error}`);
+rol_permiso.repository.ts:62 INNER JOIN Permisos p ON rp.id_permiso = p.id_permiso
+rol_permiso.repository.ts:89 .query('SELECT 1 FROM Permisos WHERE id_permiso = @id_permiso');
+rol_permiso.repository.ts:123 INNER JOIN Permisos p ON rp.id_permiso = p.id_permiso
+rol_permiso.routes.ts:8 router.use(verifyToken, authorizeByModule('Rol Permiso')); // Solo admin-equivalente via permisos
+rol_permiso.schema.ts:3 export const rolPermisoSchema = z.object({
+rol_permiso.schema.ts:8 export const createRolPermisoSchema = rolPermisoSchema;
+rol_permiso.schema.ts:9 export const updateRolPermisoSchema = rolPermisoSchema;
+rol_permiso.schema.ts:11 export type RolPermiso = z.infer<typeof rolPermisoSchema>;
+rol_permiso.schema.ts:12 export type CreateRolPermiso = z.infer<typeof createRolPermisoSchema>;
+rol_permiso.schema.ts:13 export type UpdateRolPermiso = z.infer<typeof updateRolPermisoSchema>;
+rol_permiso.service.ts:5 export const rolPermisoService = {
+rol_permiso.service.ts:10 throw new AppError('Error al obtener permisos de roles', 500);
+rol_permiso.service.ts:18 throw new AppError('Error al obtener permisos del rol', 500);
+rol_permiso.service.ts:46 return { message: 'Permisos del rol eliminados exitosamente' };
+rol_permiso.service.ts:49 throw new AppError(error.message || 'Error al eliminar permisos del rol', 500);
+seedPermisos.ts:1 import { seedDefaultPermisos } from '../modules/permisos/permisos.service';
+seedPermisos.ts:5 console.log('Starting seed of default permisos...');
+seedPermisos.ts:6 const inserted = await seedDefaultPermisos();
+seedPermisos.ts:7 console.log(`Inserted/ensured ${inserted.length} permisos.`);
+seedPermisos.ts:10 console.error('Error seeding permisos:', err);

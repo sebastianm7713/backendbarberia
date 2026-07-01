@@ -7,7 +7,9 @@
     "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
     "build": "tsc",
     "start": "node dist/server.js",
-    "test-email": "ts-node scripts/test-email.ts",
+    "seed-permisos": "ts-node src/scripts/seedPermisos.ts",
+    "cleanup-permisos": "ts-node src/scripts/cleanupPermisos.ts",
+    "test-email": "ts-node src/scripts/test-email.ts",
     "test": "jest",
     "coverage": "jest --coverage"
   },

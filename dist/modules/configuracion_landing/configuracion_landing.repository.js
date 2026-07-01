@@ -3,6 +3,17 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.configuracionLandingRepository = void 0;
 const database_1 = require("../../config/database");
 exports.configuracionLandingRepository = {
+    async getDefault() {
+        try {
+            const request = database_1.pool.request();
+            const result = await request.query('SELECT TOP 1 * FROM ConfiguracionLanding ORDER BY id DESC');
+            return result.recordset[0] || null;
+        }
+        catch (error) {
+            console.error('Repository getDefault error:', error);
+            throw new Error(`Error al obtener configuración: ${error.message}`);
+        }
+    },
     async getById(id) {
         try {
             const request = database_1.pool.request();
@@ -63,13 +74,18 @@ exports.configuracionLandingRepository = {
     },
     async update(data) {
         try {
-            const existingConfig = await this.getById(data.id);
+            const id = data.id;
+            if (typeof id !== 'number') {
+                throw new Error('ID inválido para actualizar configuración');
+            }
+            const existingConfig = await this.getById(id);
             if (!existingConfig) {
                 throw new Error('Configuración de landing no encontrada');
             }
             const mergedData = {
                 ...existingConfig,
                 ...data,
+                id,
             };
             const request = database_1.pool.request();
             request.input('id', mergedData.id);
