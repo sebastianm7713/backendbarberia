@@ -8,7 +8,7 @@ const config: sql.config = {
   database: env.DB_DATABASE,
 
   options: {
-    encrypt: false,
+    encrypt: true,
     trustServerCertificate: true,
     connectTimeout: 30000,
     requestTimeout: 30000,

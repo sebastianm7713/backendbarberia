@@ -20,6 +20,10 @@ export const env = {
   DB_SERVER: getEnvVariable("DB_SERVER"),
   DB_DATABASE: getEnvVariable("DB_DATABASE"),
 
+  DB_ENCRYPT: process.env.DB_ENCRYPT === "true",
+  DB_TRUST_SERVER_CERTIFICATE:
+    process.env.DB_TRUST_SERVER_CERTIFICATE === "true",
+
   JWT_SECRET: getEnvVariable("JWT_SECRET"),
 
   SMTP_HOST: process.env.SMTP_HOST || "",
@@ -28,5 +32,6 @@ export const env = {
   SMTP_PASSWORD: process.env.SMTP_PASSWORD || "",
   SMTP_SECURE: process.env.SMTP_SECURE === "true",
   EMAIL_FROM: process.env.EMAIL_FROM || "no-reply@yourdomain.com",
+
   FRONTEND_URL: process.env.FRONTEND_URL || "http://localhost:3000",
 };
